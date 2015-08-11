@@ -14,6 +14,73 @@
 //Globals
 const int FPS_CAP = 60;
 
+std::string readFileToString(const std::string& filePath) {
+    std::ifstream in(filePath, std::ios::in | std::ios::binary);
+    if (!in) {
+        SDL_Log("Error reading file to string.");
+        return "";
+    }
+    std::string contents;
+    in.seekg(0, std::ios::end);
+    contents.resize(in.tellg());
+    in.seekg(0, std::ios::beg);
+    in.read(&contents[0], contents.size());
+    in.close();
+    return contents;
+}
+
+class ShaderProgram {
+private:
+    GLuint programId;
+public:
+    explicit ShaderProgram();
+    void loadVertexShader(const std::string& filePath);
+    void loadGeometryShader(const std::string& filePath);
+    void loadFragmentShader(const std::string& filePath);
+    void linkProgram();
+    const GLuint getProgramId() const;
+};
+ShaderProgram::ShaderProgram() {
+    programId = glCreateProgram();
+}
+void ShaderProgram::loadVertexShader(const std::string& filePath) {
+    std::string source = readFileToString(filePath);
+    const char* cStrSource = source.c_str();
+    GLuint shaderId = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(shaderId, 1, &cStrSource, NULL);
+    glCompileShader(shaderId);
+    GLint didShaderCompile = GL_FALSE;
+    glGetShaderiv(shaderId, GL_COMPILE_STATUS, &didShaderCompile);
+    if (didShaderCompile != GL_TRUE) {
+        SDL_Log("Vertex shader compilation error.");
+    }
+    glAttachShader(programId, shaderId);
+}
+void ShaderProgram::loadFragmentShader(const std::string& filePath) {
+    std::string source = readFileToString(filePath);
+    const char* cStrSource = source.c_str();
+    GLuint shaderId = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(shaderId, 1, &cStrSource, NULL);
+    glCompileShader(shaderId);
+    GLint didShaderCompile = GL_FALSE;
+    glGetShaderiv(shaderId, GL_COMPILE_STATUS, &didShaderCompile);
+    if (didShaderCompile != GL_TRUE) {
+        SDL_Log("Fragment shader compilation error.");
+    }
+    glAttachShader(programId, shaderId);
+}
+void ShaderProgram::linkProgram() {
+    glLinkProgram(programId);
+    GLint programSuccess = GL_TRUE;
+    glGetProgramiv(programId, GL_LINK_STATUS, &programSuccess);
+    if (programSuccess != GL_TRUE) {
+        SDL_Log("Error linking program");
+    }
+}
+const GLuint ShaderProgram::getProgramId() const {
+    return programId;
+}
+
 class Face {
 private:
     int vertexIndices[3];
@@ -85,13 +152,15 @@ void Mesh::rawFileToMesh(std::string filePath) {
     std::fstream fs = std::fstream(filePath, std::ios_base::in);
     fs.getline(buf, 512);
     
-    while (!fs.eof()) {
         glm::vec4 vertices[3];
         int vertexIndices[3];
-
         std::string strBuf(buf);
         boost::char_separator<char> sep(" ");
+    while (!fs.eof()) {
+        
+        strBuf = buf;
         boost::tokenizer<boost::char_separator<char> > tokens(strBuf, sep);
+
         int i = 0;
         for (const auto& t : tokens) {
             switch (i % 3)
@@ -131,69 +200,7 @@ void Mesh::rawFileToMesh(std::string filePath) {
     }
 }
 
-bool initGl(GLuint* program, GLint* vertexPos3DLocation, GLuint* VBO, GLuint* IBO) {
-	bool success = true;
-
-	*program = glCreateProgram();
-	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	const GLchar* vertexShaderSource[] =
-	{
-		 "#version 140\n\
-		  in vec3 LVertexPos3D;\n\
-          in vec3 normals;\n\
-          uniform mat4 MVP;\n\
-          uniform vec3 light;\n\
-          out vec4 vertexColor;\n\
-          void main() {\n\
-              gl_Position = MVP * vec4(LVertexPos3D.x, LVertexPos3D.y, LVertexPos3D.z, 1 );\n\
-              vec3 newNormal = normalize(vec3(MVP * vec4(normals, 0.f)));\n\
-              vertexColor = ((dot(light, newNormal) + 1.f) / 2.f) * vec4(0.5f, 0.2f, 0.0f, 1.f) + (1 - ((dot(light, newNormal) + 1.f) / 2.f)) * vec4(0.0f, 0.05f, 0.1f, 1.f);\n\
-          }"
-	};
-    //((dot(light, newNormal) + 1.f) / 2.f)
-    glShaderSource(vertexShader, 1, vertexShaderSource, NULL);
-    glCompileShader(vertexShader);
-    GLint didShaderCompile = GL_FALSE;
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &didShaderCompile);
-    if (didShaderCompile != GL_TRUE) {
-        SDL_Log("Vertex shader compilation error.");
-        return false;
-    }
-
-    glAttachShader(*program, vertexShader);
-    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    const GLchar* fragmentShaderSource[] = 
-    {
-        "#version 140\n\
-             in vec4 vertexColor;\n\
-             out vec4 LFragment;\n\
-             void main() {\n\
-             LFragment = vertexColor;\n\
-         }"
-    };
-    glShaderSource(fragmentShader, 1, fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &didShaderCompile);
-    if (didShaderCompile != GL_TRUE) {
-        SDL_Log("Fragment shader failed to compile.");
-        return false;
-    }
-
-    glAttachShader(*program, fragmentShader);
-    glLinkProgram(*program);
-    GLint programSuccess = GL_TRUE;
-    glGetProgramiv(*program, GL_LINK_STATUS, &programSuccess);
-    if (programSuccess != GL_TRUE) {
-        SDL_Log("Error linking program");
-        return false;
-    }
-
-    *vertexPos3DLocation = glGetAttribLocation(*program, "LVertexPos3D");
-    if (*vertexPos3DLocation == -1) {
-        SDL_Log("Error getting vertexPos2DLocation");
-        return false;
-    }
-
+bool initGl() {
     glClearColor(0.f, 0.f, 0.f, 1.f);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
@@ -228,19 +235,28 @@ int main(int argc, char* argv[]) {
 		exit(1);
 	}
 
-    GLuint program = 0;
     GLint vertexPos3DLocation = -1;
     GLuint VBO = 0;
     GLuint IBO = 0;
     GLuint VNBO = 0;
     GLuint INBO = 0;
-	if (!initGl(&program, &vertexPos3DLocation, &VBO, &IBO)) {
+	if (!initGl()) {
 		SDL_Log("initGL failed.");
 		exit(1);
 	}
-    GLint vertexNormal = glGetAttribLocation(program, "normals");;
-    GLuint MVP = glGetUniformLocation(program, "MVP");
-    GLuint lightID = glGetUniformLocation(program, "light");
+    ShaderProgram shaderProgram;
+    shaderProgram.loadVertexShader("src/shaders/basic.glvs");
+    shaderProgram.loadFragmentShader("src/shaders/basic.glfs");
+    shaderProgram.linkProgram();
+
+    vertexPos3DLocation = glGetAttribLocation(shaderProgram.getProgramId(), "LVertexPos3D");
+    if (vertexPos3DLocation == -1) {
+        SDL_Log("Error getting vertexPos2DLocation");
+    }
+
+    GLint vertexNormal = glGetAttribLocation(shaderProgram.getProgramId(), "normals");;
+    GLuint MVP = glGetUniformLocation(shaderProgram.getProgramId(), "MVP");
+    GLuint lightID = glGetUniformLocation(shaderProgram.getProgramId(), "light");
     Mesh test;
     test.rawFileToMesh("res/meshes/monkeyhd.raw");
 
@@ -343,7 +359,7 @@ int main(int argc, char* argv[]) {
 
         //Render
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glUseProgram(program);
+        glUseProgram(shaderProgram.getProgramId());
         glUniformMatrix4fv(MVP, 1, GL_FALSE, &modelViewMat[0][0]);
         glUniform3fv(lightID, 1, &testLight[0]);
 
