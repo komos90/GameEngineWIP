@@ -41,7 +41,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)\bin\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)\obj\$(Configuration)\</IntDir>
-    <IncludePath>C:\Users\Seoras\My Projects\c++\OpenGLGame\libs\glew-1.12.0\include;C:\Users\Seoras\My Projects\c++\OpenGLGame\libs\SDL2-2.0.3\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\Seoras\Libraries\boost_1_58_0;C:\Users\Seoras\My Projects\c++\OpenGLGame\libs\glm;C:\Users\Seoras\My Projects\c++\OpenGLGame\libs\glew-1.12.0\include;C:\Users\Seoras\My Projects\c++\OpenGLGame\libs\SDL2-2.0.3\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\Seoras\My Projects\c++\OpenGLGame\libs\glew-1.12.0\lib\Release\Win32;C:\Users\Seoras\My Projects\c++\OpenGLGame\libs\SDL2-2.0.3\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
