@@ -71,7 +71,33 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\camera.cpp" />
+    <ClCompile Include="src\entity.cpp" />
+    <ClCompile Include="src\game.cpp" />
+    <ClCompile Include="src\level.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\mesh.cpp" />
+    <ClCompile Include="src\physics.cpp" />
+    <ClCompile Include="src\renderer.cpp" />
+    <ClCompile Include="src\shader_program.cpp" />
+    <ClCompile Include="src\transform.cpp" />
+    <ClCompile Include="src\util.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\shaders\basic.glfs" />
+    <None Include="src\shaders\basic.glvs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\camera.h" />
+    <ClInclude Include="src\entity.h" />
+    <ClInclude Include="src\game.h" />
+    <ClInclude Include="src\level.h" />
+    <ClInclude Include="src\mesh.h" />
+    <ClInclude Include="src\physics.h" />
+    <ClInclude Include="src\renderer.h" />
+    <ClInclude Include="src\shader_program.h" />
+    <ClInclude Include="src\transform.h" />
+    <ClInclude Include="src\util.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
