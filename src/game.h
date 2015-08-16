@@ -1,9 +1,9 @@
 #pragma once
 
-#include "renderer.h";
-#include "camera.h";
-#include "mesh.h";
-#include "entity.h";
+#include "renderer.h"
+#include "camera.h"
+#include "mesh.h"
+#include "entity.h"
 
 class Game {
 private:
