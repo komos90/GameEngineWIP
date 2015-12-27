@@ -1,4 +1,3 @@
-
 #include <vector>
 
 #include <gl/glew.h>
@@ -10,38 +9,23 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "renderer.h"
+#include "assertions.h"
 
 bool Renderer::init() {
-    if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
-        SDL_Log("SDL Initialisation failed.");
-        return false;
-    }
-    if (SDL_CreateWindowAndRenderer(800, 600, SDL_WINDOW_OPENGL, &window, &renderer) == -1) {
-        SDL_Log("Error creating window and renderer.");
-        return false;
-    }
+    ASSERT(SDL_Init(SDL_INIT_EVERYTHING) == 0);
+    ASSERT(SDL_CreateWindowAndRenderer(800, 600, SDL_WINDOW_OPENGL, &window, &renderer) != -1);
 
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
     SDL_GLContext glContext = SDL_GL_CreateContext(window);
-    if (glContext == NULL) {
-        SDL_Log("glContext is NULL");
-        return false;
-    }
+    ASSERT(glContext != NULL);
 
     glewExperimental = GL_TRUE;
-    GLenum glewError = glewInit();
-    if (glewError != GLEW_OK) {
-        SDL_Log("glewError != GLEW_OK");
-        return false;
-    }
+    ASSERT(glewInit() == GLEW_OK);
 
-    if (SDL_GL_SetSwapInterval(1) < 0) {
-        SDL_Log("Setting VSynch failed");
-        return false;
-    }
+    ASSERT(SDL_GL_SetSwapInterval(1) >= 0);
 
     SDL_SetRelativeMouseMode(SDL_TRUE);
 
@@ -55,9 +39,7 @@ bool Renderer::init() {
     shaderProgram.linkProgram();
 
     vertexPos3DLocation = glGetAttribLocation(shaderProgram.getProgramId(), "LVertexPos3D");
-    if (vertexPos3DLocation == -1) {
-        SDL_Log("Error getting vertexPos2DLocation");
-    }
+    ASSERT(vertexPos3DLocation != -1);
 
     vertexNormal = glGetAttribLocation(shaderProgram.getProgramId(), "normals");
     MVP = glGetUniformLocation(shaderProgram.getProgramId(), "MVP");
@@ -67,7 +49,7 @@ bool Renderer::init() {
 }
 void Renderer::render(Entity entity, Camera camera) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    float s = 0.5;
+    F32 s = 0.5;
 
     glm::mat4 rotationMatrix = glm::mat4_cast(entity.getTransform().getOrientation());
     glm::mat4 translationMatrix(1.f);
@@ -84,7 +66,7 @@ void Renderer::render(Entity entity, Camera camera) {
     glm::mat4 scaleMatrix(s);
     scaleMatrix[3][3] = 1.f;
 
-    glm::mat4 perspectiveMatrix = glm::perspective(glm::pi<float>() / 2.f, 4.f / 3.f, 0.1f, 500.f);
+    glm::mat4 perspectiveMatrix = glm::perspective(glm::pi<F32>() / 2.f, 4.f / 3.f, 0.1f, 500.f);
 
     glm::mat4 modelViewMatrix = perspectiveMatrix * cameraRotationMatrix * cameraTranslationMatrix * translationMatrix * rotationMatrix * scaleMatrix;
 
@@ -98,17 +80,17 @@ void Renderer::render(Entity entity, Camera camera) {
 
     const std::vector<Face>& meshFaces = entity.getMesh()->getFaces();
     GLuint* indexData = new GLuint[meshFaces.size() * 3];
-    for (int i = 0; i < (int)meshFaces.size(); i++) {
+    for (S32 i = 0; i < (S32)meshFaces.size(); i++) {
         indexData[i * 3] = meshFaces[i].getVertexIndexAt(0);
         indexData[i * 3 + 1] = meshFaces[i].getVertexIndexAt(1);
         indexData[i * 3 + 2] = meshFaces[i].getVertexIndexAt(2);
     }
 
     std::vector<glm::vec3> normals(meshCopy.size());
-    for (int i = 0; i < (int)meshCopy.size(); i++) {
-        const std::vector<int>& tmp = entity.getMesh()->getVertices()[i].getFaces();
+    for (S32 i = 0; i < (S32)meshCopy.size(); i++) {
+        const std::vector<S32>& tmp = entity.getMesh()->getVertices()[i].getFaces();
         glm::vec3 sum(0.f, 0.f, 0.f);
-        for (int j = 0; j < (int)tmp.size(); j++) {
+        for (S32 j = 0; j < (S32)tmp.size(); j++) {
             sum += entity.getMesh()->getFaces()[tmp[j]].getNormal();
         }
         sum /= tmp.size();

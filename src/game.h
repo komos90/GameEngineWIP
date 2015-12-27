@@ -10,11 +10,11 @@ private:
     mutable Renderer renderer;
     //tmp
     Camera camera;
-    Mesh levelTerrainMesh;
+    //Mesh levelTerrainMesh;
     Mesh test;
     Entity testMonkey1;
-    Entity testMonkey2;
-    Entity levelTerrain;
+    //Entity testMonkey2;
+    //Entity levelTerrain;
     bool running = true;
 
 public:

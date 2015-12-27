@@ -41,7 +41,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)\bin\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)\obj\$(Configuration)\</IntDir>
-    <IncludePath>C:\Users\Seoras\Libraries\boost_1_58_0;C:\Users\Seoras\My Projects\c++\OpenGLGame\libs\glm;C:\Users\Seoras\My Projects\c++\OpenGLGame\libs\glew-1.12.0\include;C:\Users\Seoras\My Projects\c++\OpenGLGame\libs\SDL2-2.0.3\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\Seoras\My Projects\c++\OpenGLGame\3rd_party;C:\Users\Seoras\My Projects\c++\OpenGLGame\libs\glm;C:\Users\Seoras\My Projects\c++\OpenGLGame\libs\glew-1.12.0\include;C:\Users\Seoras\My Projects\c++\OpenGLGame\libs\SDL2-2.0.3\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\Seoras\My Projects\c++\OpenGLGame\libs\glew-1.12.0\lib\Release\Win32;C:\Users\Seoras\My Projects\c++\OpenGLGame\libs\SDL2-2.0.3\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -50,6 +50,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <TreatWarningAsError>false</TreatWarningAsError>
+      <PreprocessorDefinitions>ASSERTIONS_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -74,6 +75,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="3rd_party\pugixml.cpp" />
+    <ClCompile Include="src\assertions.cpp" />
     <ClCompile Include="src\camera.cpp" />
     <ClCompile Include="src\entity.cpp" />
     <ClCompile Include="src\game.cpp" />
@@ -91,7 +94,11 @@
     <None Include="src\shaders\basic.glvs" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="3rd_party\pugiconfig.hpp" />
+    <ClInclude Include="3rd_party\pugixml.hpp" />
+    <ClInclude Include="src\assertions.h" />
     <ClInclude Include="src\camera.h" />
+    <ClInclude Include="src\common_imports.h" />
     <ClInclude Include="src\entity.h" />
     <ClInclude Include="src\game.h" />
     <ClInclude Include="src\level.h" />
@@ -100,6 +107,7 @@
     <ClInclude Include="src\renderer.h" />
     <ClInclude Include="src\shader_program.h" />
     <ClInclude Include="src\transform.h" />
+    <ClInclude Include="src\typedefs.h" />
     <ClInclude Include="src\util.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -12,26 +12,32 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/constants.hpp>
 
-
+#include "common_imports.h"
 #include "mesh.h"
 #include "game.h"
 
+// Debug memory leaks
+//#define _CRTDBG_MAP_ALLOC
+//#include <stdlib.h>
+//#include <crtdbg.h>
+
 //Globals
-const int FPS_CAP = 60;
+const S32 FPS_CAP = 60;
 
-
-int main(int argc, char* argv[]) {
-
+/*------------------------------------------
+ * There are 39 000 Lines of Code in Doom.
+ -----------------------------------------*/
+int main(S32 argc, char* argv[]) {
     Game game;
     if (!game.init()) {
         SDL_Log("Game initialisation failed.");
     }
 
-    float theta = 0.01f;
+    F32 theta = 0.01f;
     bool running = true;
     while (running) {
         //Manage fps
-        int frameStartTime = SDL_GetTicks();
+        S32 frameStartTime = SDL_GetTicks();
 
         game.events();
         game.logic();
@@ -44,5 +50,6 @@ int main(int argc, char* argv[]) {
             SDL_Delay(1000 / FPS_CAP - frameDelta);
         }
     }
+    //_CrtDumpMemoryLeaks();
 	return 0;
 }

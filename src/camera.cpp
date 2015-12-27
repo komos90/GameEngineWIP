@@ -1,4 +1,5 @@
 
+#include "common_imports.h"
 #include "camera.h"
 
 Camera::Camera() {
@@ -10,10 +11,10 @@ const Transform& Camera::getTransform() const {
 void Camera::rotate(glm::quat rotation) {
     transform.rotate(rotation);
 }
-void Camera::rotateHorizontal(float radians) {
+void Camera::rotateHorizontal(F32 radians) {
     transform.setOrientation(glm::rotate(transform.getOrientation(), radians, up));
 }
-void Camera::rotateVertical(float radians) {
+void Camera::rotateVertical(F32 radians) {
     transform.setOrientation(glm::rotate(transform.getOrientation(), radians, up));
 }
 void Camera::translate(const glm::vec3& translation) {
