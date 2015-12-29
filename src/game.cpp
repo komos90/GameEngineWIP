@@ -1,23 +1,26 @@
+#include <SDL.h>
+
 
 #include "common_imports.h"
 #include "game.h"
+#include "render_manager.h"
+#include "resource_manager.h"
 
-bool Game::init() {
-    if (!renderer.init()) {
-        SDL_Log("Renderer initialisation failed.");
-        return false;
-    }
-    //tmp
-    test.daeFileToMesh("res/meshes/crate.dae");
-    //levelTerrainMesh.daeFileToMesh("res/meshes/level1terrain.raw");
+Game::Game() {
+    // NOTE: Should this be here or in gResourceManager.init()?
+    gResourceManager.loadGlobalResources();
+    // NOTE: guid path should not have res/engine_ready/
+    test = gResourceManager.getMesh("crate/crate.dae");
 
-    testMonkey1.setMesh(&test);
+    //Should create a factory method for Entity. static method in subClass?
+    testMonkey1.setMesh(test);
     testMonkey1.translate(glm::vec3(0.f, 0.f, -5.f));
-    //testMonkey2.setMesh(&test);
-    //levelTerrain.setMesh(&levelTerrainMesh);
-    //testMonkey2.translate(glm::vec3(0.5f, 0.5f, 0.5f));
-    return true;
 }
+
+Game::~Game() {
+
+}
+
 bool Game::isRunning() {
     return running;
 }
@@ -55,12 +58,9 @@ void Game::events() {
     }
 }
 void Game::logic() {
-    testMonkey1.rotate(glm::quat(glm::vec3(0.03f, 0.03f, 0.03f)));
-    //testMonkey2.rotate(glm::quat(glm::vec3(-0.05f, 0.05f, 0.05f)));
+    //testMonkey1.rotate(glm::quat(glm::vec3(0.00f, 0.03f, 0.00f)));
 }
 void Game::draw() const {
 
-    renderer.render(testMonkey1, camera);
-    //renderer.render(levelTerrain, camera);
-    //renderer.render(testMonkey2);
+    gRenderManager.render(testMonkey1, camera);
 }

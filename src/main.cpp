@@ -15,6 +15,9 @@
 #include "common_imports.h"
 #include "mesh.h"
 #include "game.h"
+#include "render_manager.h"
+#include "file_system_manager.h"
+#include "resource_manager.h"
 
 // Debug memory leaks
 //#define _CRTDBG_MAP_ALLOC
@@ -28,12 +31,12 @@ const S32 FPS_CAP = 60;
  * There are 39 000 Lines of Code in Doom.
  -----------------------------------------*/
 int main(S32 argc, char* argv[]) {
-    Game game;
-    if (!game.init()) {
-        SDL_Log("Game initialisation failed.");
-    }
+    // Initialise Subsystems
+    gFileSystemManager.init();
+    gResourceManager.init();
+    gRenderManager.init();
 
-    F32 theta = 0.01f;
+    Game game;
     bool running = true;
     while (running) {
         //Manage fps
@@ -42,14 +45,19 @@ int main(S32 argc, char* argv[]) {
         game.events();
         game.logic();
         game.draw();
+        running = game.isRunning();
 
-        if (!game.isRunning()) running = false;
         //Manage fps
         int frameDelta = SDL_GetTicks() - frameStartTime;
         if (frameDelta < 1000 / FPS_CAP) {
             SDL_Delay(1000 / FPS_CAP - frameDelta);
         }
     }
+    //Shutdown subsystems
+    gRenderManager.destroy();
+    gResourceManager.init();
+    gFileSystemManager.destroy();
+
     //_CrtDumpMemoryLeaks();
 	return 0;
 }
