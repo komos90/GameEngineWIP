@@ -20,14 +20,17 @@ Face::Face(S32 a, S32 b, S32 c) {
     vertexIndices[1] = b;
     vertexIndices[2] = c;
 }
-void Face::setNormal(glm::vec3 normal) {
-    this->normal = normal;
+void Face::setUvIndexAt(S32 i, S32 uvIndex) {
+    ASSERT(i >= 0 && i < 3);
+    uvIndices[i] = uvIndex;
 }
 S32 Face::getVertexIndexAt(S32 i) const {
+    ASSERT(i >= 0 && i < 3);
     return vertexIndices[i];
 }
-const glm::vec3& Face::getNormal() const {
-    return normal;
+S32 Face::getUvIndexAt(S32 i) const {
+    ASSERT(i >= 0 && i < 3);
+    return uvIndices[i];
 }
 
 void Vertex::addFaceIndex(S32 i) {
@@ -39,11 +42,18 @@ Vertex::Vertex() {
 Vertex::Vertex(glm::vec4 &vector) {
     vertex = vector;
 }
+void Vertex::setNormal(const glm::vec3& normal) {
+    this->normal = normal;
+}
+
 const glm::vec4& Vertex::getVector() const {
     return vertex;
 }
 const std::vector<S32>& Vertex::getFaces() const {
     return faces;
+}
+const glm::vec3& Vertex::getNormal() const {
+    return normal;
 }
 
 const std::vector<Vertex>& Mesh::getVertices() const {
@@ -119,18 +129,21 @@ void Mesh::daeFileToMesh(std::string filePath) {
     }
     for (auto i = size_t(0); i < texVerticesFloatVec.size(); i++) {
         if (i % 2 == 0) {
-            this->uvTexCoords.push_back(glm::vec2(texVerticesFloatVec[i], texVerticesFloatVec[i + 1]));
+            this->textureCoords.push_back(glm::vec2(texVerticesFloatVec[i], texVerticesFloatVec[i + 1]));
         }
     }
     for (auto i = size_t(0); i < posIndicesVec.size(); i++) {
         if (i % 3 == 0) {
             auto face = Face(posIndicesVec[i], posIndicesVec[i + 1], posIndicesVec[i + 2]);
-            face.uvIndices[0] = texIndicesVec[i];
-            face.uvIndices[1] = texIndicesVec[i + 1];
-            face.uvIndices[2] = texIndicesVec[i + 2];
-            face.setNormal(glm::vec3(normVerticesFloatVec[normIndicesVec[i]],
+            face.setUvIndexAt(0, texIndicesVec[i]);
+            face.setUvIndexAt(1, texIndicesVec[i + 1]);
+            face.setUvIndexAt(2, texIndicesVec[i + 2]);
+            /*face.setNormal(glm::vec3(normVerticesFloatVec[normIndicesVec[i]],
                                      normVerticesFloatVec[normIndicesVec[i + 1]],
-                                     normVerticesFloatVec[normIndicesVec[i + 2]]));
+                                     normVerticesFloatVec[normIndicesVec[i + 2]]));*/
+            for (auto j = i; j < i + 3; j++){
+                this->vertices[posIndicesVec[i]].setNormal(glm::vec3(normVerticesFloatVec[normIndicesVec[i] / 3], texVerticesFloatVec[texIndicesVec[i] / 3 + 1], texVerticesFloatVec[texIndicesVec[i] / 3 + 2]));
+            }
             this->faces.push_back(face);
             this->vertices[posIndicesVec[i]].addFaceIndex(i / 3);
             this->vertices[posIndicesVec[i + 1]].addFaceIndex(i / 3);
@@ -143,6 +156,6 @@ const Texture* Mesh::getTexture() const {
     return texture;
 }
 
-const std::vector<glm::vec2>& Mesh::getUvTexCoords() const {
-    return uvTexCoords;
+const std::vector<glm::vec2>& Mesh::getTextureCoords() const {
+    return textureCoords;
 }

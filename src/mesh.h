@@ -16,41 +16,39 @@
 class Face {
 private:
     S32 vertexIndices[3];
-    
-    glm::vec3 normal;
-public:
-    // NOTE: make private + getters/setters
     S32 uvIndices[3];
+public:
     explicit Face(S32 a, S32 b, S32 c);
-    void setNormal(glm::vec3 normal);
+    void Face::setUvIndexAt(S32 i, S32 uvIndex);
     S32 Face::getVertexIndexAt(S32 i) const;
-    const glm::vec3& Face::getNormal() const;
+    S32 Face::getUvIndexAt(S32 i) const;
 };
 
 class Vertex {
 private:
     glm::vec4 vertex;
+    glm::vec3 normal;
     std::vector<S32> faces;
 public:
     explicit Vertex();
     explicit Vertex(glm::vec4 &vector);
     void addFaceIndex(S32 i);
+    void setNormal(const glm::vec3& normal);
     const glm::vec4& getVector() const;
     const std::vector<S32>& getFaces() const;
+    const glm::vec3& getNormal() const;
 };
 
 class Mesh {
 private:
-    // NOTE: Should wrap opengl stuff?
-    // NOTE: Mesh can't be a POD if it uses std::vector?
-    // NOTE: Mesh shouldn't be POD!
     std::vector<Vertex> vertices;
+    std::vector<glm::vec2> textureCoords;
     std::vector<Face> faces;
-    // NOTE: Should this be encapuslated/ use a class instead of glm::vec2
-    std::vector<glm::vec2> uvTexCoords;
-    // NOTE: Add getters/setters and generally decide on the best way to arrange mesh class.
+
     const Texture* texture;
 public:
+    // NOTE: Should wrap opengl stuff?
+    // handles for mesh data held in GPU
     mutable GLuint vboId;
     mutable GLuint iboId;
     mutable GLuint uvboId;
@@ -58,11 +56,11 @@ public:
     mutable GLuint vnboId;
 
     explicit Mesh();
-    //Should be in gMeshManager
+    // NOTE: Should be in gResourceManager
     void daeFileToMesh(std::string filePath);
     const std::vector<Vertex>& getVertices() const;
     const std::vector<Face>& getFaces() const;
-    const std::vector<glm::vec2>& getUvTexCoords() const; //NOTE: needs a better name
+    const std::vector<glm::vec2>& getTextureCoords() const;
     const Texture* getTexture() const;
 };
 

@@ -21,16 +21,15 @@ void TimeManager::destroy() {
 }
 U64 TimeManager::getTicks() {
     LARGE_INTEGER ticks;
-    
-    bool result = QueryPerformanceCounter(&ticks);
+    BOOL result = QueryPerformanceCounter(&ticks);
     ASSERT(result);
     return static_cast<U64>(ticks.QuadPart);
 }
 U32 TimeManager::getTicksPerSecond() {
     LARGE_INTEGER freq;
-    bool result = QueryPerformanceFrequency(&freq);
+    BOOL result = QueryPerformanceFrequency(&freq);
     ASSERT(result);
-    return static_cast<U64>(freq.QuadPart);
+    return static_cast<U32>(freq.QuadPart);
 }
 F32 TimeManager::getTimeDiffInSeconds(U64 start, U64 end) {
     ASSERT(end >= start);

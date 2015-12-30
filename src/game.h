@@ -6,13 +6,14 @@
 
 class Game {
 private:
-    //tmp
+    // 
+    // GameStateStack gameStates;
+    // tmp
     Camera camera;
-    //Mesh levelTerrainMesh;
     const Mesh* test;
     Entity testMonkey1;
-    //Entity testMonkey2;
-    //Entity levelTerrain;
+    // end tmp
+
     bool running = true;
 
 public:

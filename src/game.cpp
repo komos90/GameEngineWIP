@@ -5,6 +5,7 @@
 #include "game.h"
 #include "render_manager.h"
 #include "resource_manager.h"
+#include "level.h"
 
 Game::Game() {
     // NOTE: Should this be here or in gResourceManager.init()?
@@ -15,6 +16,7 @@ Game::Game() {
     //Should create a factory method for Entity. static method in subClass?
     testMonkey1.setMesh(test);
     testMonkey1.translate(glm::vec3(0.f, 0.f, -5.f));
+    Level level;
 }
 
 Game::~Game() {
@@ -58,7 +60,7 @@ void Game::events() {
     }
 }
 void Game::logic() {
-    //testMonkey1.rotate(glm::quat(glm::vec3(0.00f, 0.03f, 0.00f)));
+    testMonkey1.rotate(glm::quat(glm::vec3(0.00f, 0.03f, 0.00f)));
 }
 void Game::draw() const {
 
