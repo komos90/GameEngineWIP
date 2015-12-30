@@ -5,7 +5,7 @@
 #include "util.h"
 
 void ShaderProgram::init() {
-    programId = glCreateProgram();
+    programId_ = glCreateProgram();
 }
 void ShaderProgram::loadVertexShader(const std::string& filePath) {
     std::string source = gFileSystemManager.readFileToString(filePath);
@@ -16,7 +16,7 @@ void ShaderProgram::loadVertexShader(const std::string& filePath) {
     GLint didShaderCompile = GL_FALSE;
     glGetShaderiv(shaderId, GL_COMPILE_STATUS, &didShaderCompile);
     ASSERT(didShaderCompile == GL_TRUE);
-    glAttachShader(programId, shaderId);
+    glAttachShader(programId_, shaderId);
 }
 void ShaderProgram::loadFragmentShader(const std::string& filePath) {
     std::string source = gFileSystemManager.readFileToString(filePath);
@@ -27,14 +27,14 @@ void ShaderProgram::loadFragmentShader(const std::string& filePath) {
     GLint didShaderCompile = GL_FALSE;
     glGetShaderiv(shaderId, GL_COMPILE_STATUS, &didShaderCompile);
     ASSERT(didShaderCompile == GL_TRUE);
-    glAttachShader(programId, shaderId);
+    glAttachShader(programId_, shaderId);
 }
 void ShaderProgram::linkProgram() {
-    glLinkProgram(programId);
+    glLinkProgram(programId_);
     GLint programSuccess = GL_TRUE;
-    glGetProgramiv(programId, GL_LINK_STATUS, &programSuccess);
+    glGetProgramiv(programId_, GL_LINK_STATUS, &programSuccess);
     ASSERT(programSuccess == GL_TRUE);
 }
 const GLuint ShaderProgram::getProgramId() const {
-    return programId;
+    return programId_;
 }

@@ -1,17 +1,17 @@
 #include "entity.h"
 
 void Entity::setMesh(const Mesh* mesh) {
-    this->mesh = mesh;
+    mesh_ = mesh;
 }
 const Mesh* Entity::getMesh() {
-    return mesh;
+    return mesh_;
 }
 const Transform& Entity::getTransform() const {
-    return transform;
+    return transform_;
 }
 void Entity::rotate(glm::quat rotation) {
-    transform.rotate(rotation);
+    transform_.rotate(rotation);
 }
 void Entity::translate(const glm::vec3& translation) {
-    transform.translate(translation);
+    transform_.translate(translation);
 }

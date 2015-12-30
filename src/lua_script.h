@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 extern "C" {
     #include "lua.h"
 }
@@ -7,8 +9,9 @@ extern "C" {
 class LuaScript {
 private:
     // NOTE: Might be a good idea to have a gScriptManager.
-    lua_State* state;
+    lua_State* state_;
 public:
     explicit LuaScript();
     ~LuaScript();
+    void runScript(const std::string& path);
 };

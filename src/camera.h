@@ -8,8 +8,8 @@
 
 class Camera {
 private:
-    Transform transform;
-    glm::vec3 up;
+    Transform transform_;
+    glm::vec3 up_;
 public:
     explicit Camera();
     void rotate(glm::quat rotation);

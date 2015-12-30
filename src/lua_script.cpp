@@ -7,16 +7,18 @@ extern "C" {
 #include "lua_script.h"
 
 LuaScript::LuaScript() {
-    state = luaL_newstate();
-    luaL_openlibs(state);
+    state_ = luaL_newstate();
+    luaL_openlibs(state_);
 #if _DEBUG
-    lua_pushboolean(state, true);
+    lua_pushboolean(state_, true);
 #else
-    lua_pushboolean(state, false);
+    lua_pushboolean(state_, false);
 #endif
-    lua_setglobal(state, "DEBUG");
-    luaL_dofile(state, "res/engine_ready/level1/test.lua");
+    lua_setglobal(state_, "DEBUG");
 }
 LuaScript::~LuaScript() {
-    lua_close(state);
+    lua_close(state_);
+}
+void LuaScript::runScript(const std::string& path) {
+    luaL_dofile(state_, path.c_str());
 }

@@ -8,7 +8,7 @@
 //NOTE: Should the texture load itself?
 //      How should I hide this explicit opengl stuff?
 Texture::Texture(GLuint textureId):
-    textureId(textureId)
+textureId_(textureId)
 {
 
 }
@@ -18,5 +18,5 @@ Texture::~Texture() {
 }
 
 GLuint Texture::getTextureId() const {
-    return textureId;
+    return textureId_;
 }

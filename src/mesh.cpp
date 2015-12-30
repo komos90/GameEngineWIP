@@ -16,71 +16,71 @@
 #include "resource_manager.h"
 
 Face::Face(S32 a, S32 b, S32 c) {
-    vertexIndices[0] = a;
-    vertexIndices[1] = b;
-    vertexIndices[2] = c;
+    vertexIndices_[0] = a;
+    vertexIndices_[1] = b;
+    vertexIndices_[2] = c;
 }
 void Face::setUvIndexAt(S32 i, S32 uvIndex) {
     ASSERT(i >= 0 && i < 3);
-    uvIndices[i] = uvIndex;
+    uvIndices_[i] = uvIndex;
 }
 S32 Face::getVertexIndexAt(S32 i) const {
     ASSERT(i >= 0 && i < 3);
-    return vertexIndices[i];
+    return vertexIndices_[i];
 }
 S32 Face::getUvIndexAt(S32 i) const {
     ASSERT(i >= 0 && i < 3);
-    return uvIndices[i];
+    return uvIndices_[i];
 }
 
 void Vertex::addFaceIndex(S32 i) {
-    faces.push_back(i);
+    faces_.push_back(i);
 }
 Vertex::Vertex() {
-    vertex = glm::vec4();
+    vertex_ = glm::vec4();
 }
 Vertex::Vertex(glm::vec4 &vector) {
-    vertex = vector;
+    vertex_ = vector;
 }
 void Vertex::setNormal(const glm::vec3& normal) {
-    this->normal = normal;
+    normal_ = normal;
 }
 
 const glm::vec4& Vertex::getVector() const {
-    return vertex;
+    return vertex_;
 }
 const std::vector<S32>& Vertex::getFaces() const {
-    return faces;
+    return faces_;
 }
 const glm::vec3& Vertex::getNormal() const {
-    return normal;
+    return normal_;
 }
 
 const std::vector<Vertex>& Mesh::getVertices() const {
-    return vertices;
+    return vertices_;
 }
 const std::vector<Face>& Mesh::getFaces() const {
-    return faces;
+    return faces_;
 }
 
 Mesh::Mesh() :
-    vboId(-1),
-    iboId(-1), 
-    uvboId(-1),
-    vnboId(-1)
+    vboId_(-1),
+    iboId_(-1),
+    uvboId_(-1),
+    vnboId_(-1)
 {
 
 }
 
 void Mesh::daeFileToMesh(std::string filePath) {
-    this->vertices.clear();
-    this->faces.clear();
+    vertices_.clear();
+    faces_.clear();
     pugi::xml_document doc;
     auto result = doc.load_file(filePath.c_str());
     ASSERT(result.status == pugi::status_ok);
 
     auto texturePath = doc.child("COLLADA").child("library_images").child("image").child("init_from").first_child().value();
-    this->texture = gResourceManager.getTexture(texturePath);
+    texture_ = gResourceManager.getTexture(texturePath);
 
     auto meshNode = doc.child("COLLADA").child("library_geometries").child("geometry").child("mesh");
     auto polyListNode = meshNode.child("polylist");
@@ -124,12 +124,12 @@ void Mesh::daeFileToMesh(std::string filePath) {
     
     for (auto i = size_t(0); i < verticesFloatVec.size(); i++) {
         if (i % 3 == 0) {
-            this->vertices.push_back(Vertex(glm::vec4(verticesFloatVec[i], verticesFloatVec[i + 1], verticesFloatVec[i + 2], 0.f)));
+            vertices_.push_back(Vertex(glm::vec4(verticesFloatVec[i], verticesFloatVec[i + 1], verticesFloatVec[i + 2], 0.f)));
         }
     }
     for (auto i = size_t(0); i < texVerticesFloatVec.size(); i++) {
         if (i % 2 == 0) {
-            this->textureCoords.push_back(glm::vec2(texVerticesFloatVec[i], texVerticesFloatVec[i + 1]));
+            textureCoords_.push_back(glm::vec2(texVerticesFloatVec[i], texVerticesFloatVec[i + 1]));
         }
     }
     for (auto i = size_t(0); i < posIndicesVec.size(); i++) {
@@ -142,20 +142,20 @@ void Mesh::daeFileToMesh(std::string filePath) {
                                      normVerticesFloatVec[normIndicesVec[i + 1]],
                                      normVerticesFloatVec[normIndicesVec[i + 2]]));*/
             for (auto j = i; j < i + 3; j++){
-                this->vertices[posIndicesVec[i]].setNormal(glm::vec3(normVerticesFloatVec[normIndicesVec[i] / 3], texVerticesFloatVec[texIndicesVec[i] / 3 + 1], texVerticesFloatVec[texIndicesVec[i] / 3 + 2]));
+                vertices_[posIndicesVec[i]].setNormal(glm::vec3(normVerticesFloatVec[normIndicesVec[i] / 3], texVerticesFloatVec[texIndicesVec[i] / 3 + 1], texVerticesFloatVec[texIndicesVec[i] / 3 + 2]));
             }
-            this->faces.push_back(face);
-            this->vertices[posIndicesVec[i]].addFaceIndex(i / 3);
-            this->vertices[posIndicesVec[i + 1]].addFaceIndex(i / 3);
-            this->vertices[posIndicesVec[i + 2]].addFaceIndex(i / 3);
+            faces_.push_back(face);
+            vertices_[posIndicesVec[i]].addFaceIndex(i / 3);
+            vertices_[posIndicesVec[i + 1]].addFaceIndex(i / 3);
+            vertices_[posIndicesVec[i + 2]].addFaceIndex(i / 3);
         }
     }
 }
 
 const Texture* Mesh::getTexture() const {
-    return texture;
+    return texture_;
 }
 
 const std::vector<glm::vec2>& Mesh::getTextureCoords() const {
-    return textureCoords;
+    return textureCoords_;
 }

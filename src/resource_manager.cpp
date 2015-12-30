@@ -14,13 +14,13 @@ ResourceManager gResourceManager;
 
 
 void ResourceManager::loadMesh(const std::string& guid) {
-    ASSERT(resources[guid].type == ResourceType::MESH);
+    ASSERT(resources_[guid].type == ResourceType::MESH);
 
-    meshes.push_back(Mesh());
+    meshes_.push_back(Mesh());
     //NOTE: Resource manager should  do the loading of dae file
     //NOTE: Should have a base path for resources
-    meshes[meshes.size() - 1].daeFileToMesh("res/engine_ready/" + guid);
-    resources[guid].handle = meshes.size() - 1;
+    meshes_[meshes_.size() - 1].daeFileToMesh("res/engine_ready/" + guid);
+    resources_[guid].handle = meshes_.size() - 1;
 }
 
 void ResourceManager::loadTexture(const std::string& guid) {
@@ -37,14 +37,14 @@ void ResourceManager::loadTexture(const std::string& guid) {
     glBindTexture(GL_TEXTURE_2D, 0);
     SDL_FreeSurface(texSurf);
 
-    textures.push_back(Texture(texId));
-    resources[guid].handle = textures.size() - 1;
+    textures_.push_back(Texture(texId));
+    resources_[guid].handle = textures_.size() - 1;
 }
 
 ResourceManager::ResourceManager() :
     //NOTE: Should have defines in a file for BASE_PATH, RES_PATH etc.
-    hasInit(false),
-    globalResourcesArchivePath("res/global_assets.zip")
+    hasInit_(false),
+    globalResourcesArchivePath_("res/global_assets.zip")
 {
     ASSERT(this == &gResourceManager);
 }
@@ -52,39 +52,39 @@ ResourceManager::~ResourceManager() {
 
 }
 void ResourceManager::init() {
-    hasInit = true;
+    hasInit_ = true;
 }
 void ResourceManager::destroy() {
     
 }
 
 void ResourceManager::loadGlobalResources() {
-    ASSERT(hasInit);
+    ASSERT(hasInit_);
     //Archive globalResources = gFileSystemManager.loadArchive(globalResourcesArchivePath);
     //TMP
     Resource crateTexRes;
     crateTexRes.type = ResourceType::TEXTURE;
-    resources["textures/crate_texture.png"] = crateTexRes;
+    resources_["textures/crate_texture.png"] = crateTexRes;
     loadTexture("textures/crate_texture.png");
 
     Resource crateRes;
     crateRes.type = ResourceType::MESH;
-    resources["crate/crate.dae"] = crateRes;
+    resources_["crate/crate.dae"] = crateRes;
     loadMesh("crate/crate.dae");
 
     //ENDTMP
 }
 
 const Mesh* ResourceManager::getMesh(const std::string& guid) {
-    ASSERT(hasInit);
+    ASSERT(hasInit_);
     //NOTE: Maybe it''s silly to have a resources Map, instead should have seperate mesh map, tex map etc.
     //NOTE: Meshes should probably be cached in the renderer.So store a GLuint id as well as mesh data in Mesh.
-    ASSERT(resources.find(guid) != resources.end());
-    return &meshes[resources[guid].handle];
+    ASSERT(resources_.find(guid) != resources_.end());
+    return &meshes_[resources_[guid].handle];
 }
 
 const Texture* ResourceManager::getTexture(const std::string& guid) {
-    ASSERT(hasInit);
-    ASSERT(resources.find(guid) != resources.end());
-    return &textures[resources[guid].handle];
+    ASSERT(hasInit_);
+    ASSERT(resources_.find(guid) != resources_.end());
+    return &textures_[resources_[guid].handle];
 }

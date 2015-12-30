@@ -6,7 +6,7 @@
 
 class Texture {
 private:
-    GLuint textureId;
+    GLuint textureId_;
 public:
     explicit Texture(GLuint textureId);
     ~Texture();

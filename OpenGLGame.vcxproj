@@ -86,6 +86,7 @@
   <ItemGroup>
     <ClCompile Include="src\assertions.cpp" />
     <ClCompile Include="src\camera.cpp" />
+    <ClCompile Include="src\clock.cpp" />
     <ClCompile Include="src\entity.cpp" />
     <ClCompile Include="src\file_system_manager.cpp" />
     <ClCompile Include="src\game.cpp" />
@@ -113,6 +114,7 @@
     <ClInclude Include="3rd_party\pugixml.hpp" />
     <ClInclude Include="src\assertions.h" />
     <ClInclude Include="src\camera.h" />
+    <ClInclude Include="src\clock.h" />
     <ClInclude Include="src\common_imports.h" />
     <ClInclude Include="src\entity.h" />
     <ClInclude Include="src\file_system_manager.h" />

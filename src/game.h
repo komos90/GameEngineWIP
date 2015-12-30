@@ -3,18 +3,17 @@
 #include "camera.h"
 #include "mesh.h"
 #include "entity.h"
+#include "level.h"
 
 class Game {
 private:
     // 
     // GameStateStack gameStates;
     // tmp
-    Camera camera;
-    const Mesh* test;
-    Entity testMonkey1;
+    Level level_;
     // end tmp
 
-    bool running = true;
+    bool running_ = true;
 
 public:
     explicit Game();

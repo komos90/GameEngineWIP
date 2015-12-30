@@ -8,7 +8,7 @@
 
 class ShaderProgram {
 private:
-    GLuint programId;
+    GLuint programId_;
 public:
     void init();
     void loadVertexShader(const std::string& filePath);

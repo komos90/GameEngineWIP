@@ -36,6 +36,8 @@ int main(S32 argc, char* argv[]) {
     gResourceManager.init();
     gRenderManager.init();
 
+    // NOTE: Should this be here or in gResourceManager.init() or in GameStateStack?
+    gResourceManager.loadGlobalResources();
     Game game;
     bool running = true;
     while (running) {

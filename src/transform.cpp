@@ -1,17 +1,17 @@
 #include "transform.h"
 
 const glm::vec3& Transform::getPosition() const {
-    return position;
+    return position_;
 }
 const glm::quat& Transform::getOrientation() const {
-    return orientation;
+    return orientation_;
 }
 void Transform::setOrientation(const glm::quat& orientation) {
-    this->orientation = orientation;
+    orientation_ = orientation;
 }
 void Transform::rotate(glm::quat rotation) {
-    orientation *= rotation;
+    orientation_ *= rotation;
 }
 void Transform::translate(const glm::vec3& translation) {
-    position += translation;
+    position_ += translation;
 }

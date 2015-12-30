@@ -11,12 +11,12 @@
 //TODO: Implement resource manager PROPERLY!
 class ResourceManager {
 private:
-    bool hasInit;
-    const std::string globalResourcesArchivePath;
+    bool hasInit_;
+    const std::string globalResourcesArchivePath_;
 
-    std::map<std::string, Resource> resources;
-    std::vector<Mesh> meshes;
-    std::vector<Texture> textures;
+    std::map<std::string, Resource> resources_;
+    std::vector<Mesh> meshes_;
+    std::vector<Texture> textures_;
 
     void loadMesh(const std::string& guid);
     void loadTexture(const std::string& guid);

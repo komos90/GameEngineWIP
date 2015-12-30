@@ -7,8 +7,8 @@
 
 class Entity {
 private:
-    Transform transform;
-    const Mesh* mesh;
+    Transform transform_;
+    const Mesh* mesh_;
 public:
     void setMesh(const Mesh* mesh);
     const Mesh* getMesh();

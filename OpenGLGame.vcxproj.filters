@@ -72,6 +72,9 @@
     <ClCompile Include="src\lua_script.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\clock.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shaders\fragment_shader.glsl">
@@ -146,6 +149,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\lua_script.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\clock.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

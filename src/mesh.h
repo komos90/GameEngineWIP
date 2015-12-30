@@ -15,8 +15,8 @@
 
 class Face {
 private:
-    S32 vertexIndices[3];
-    S32 uvIndices[3];
+    S32 vertexIndices_[3];
+    S32 uvIndices_[3];
 public:
     explicit Face(S32 a, S32 b, S32 c);
     void Face::setUvIndexAt(S32 i, S32 uvIndex);
@@ -26,9 +26,9 @@ public:
 
 class Vertex {
 private:
-    glm::vec4 vertex;
-    glm::vec3 normal;
-    std::vector<S32> faces;
+    glm::vec4 vertex_;
+    glm::vec3 normal_;
+    std::vector<S32> faces_;
 public:
     explicit Vertex();
     explicit Vertex(glm::vec4 &vector);
@@ -41,19 +41,19 @@ public:
 
 class Mesh {
 private:
-    std::vector<Vertex> vertices;
-    std::vector<glm::vec2> textureCoords;
-    std::vector<Face> faces;
+    std::vector<Vertex> vertices_;
+    std::vector<glm::vec2> textureCoords_;
+    std::vector<Face> faces_;
 
-    const Texture* texture;
+    const Texture* texture_;
 public:
     // NOTE: Should wrap opengl stuff?
     // handles for mesh data held in GPU
-    mutable GLuint vboId;
-    mutable GLuint iboId;
-    mutable GLuint uvboId;
-    mutable GLuint uviboId;
-    mutable GLuint vnboId;
+    mutable GLuint vboId_;
+    mutable GLuint iboId_;
+    mutable GLuint uvboId_;
+    mutable GLuint uviboId_;
+    mutable GLuint vnboId_;
 
     explicit Mesh();
     // NOTE: Should be in gResourceManager
