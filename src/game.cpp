@@ -7,7 +7,9 @@
 #include "resource_manager.h"
 #include "level.h"
 
-Game::Game() {
+Game::Game() :
+    level_("level1")
+{
     
 }
 
@@ -25,5 +27,7 @@ void Game::logic() {
     level_.logic();
 }
 void Game::draw() const {
+    gRenderManager.clear();
     level_.draw();
+    gRenderManager.swap();
 }

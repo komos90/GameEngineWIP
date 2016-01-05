@@ -10,7 +10,9 @@ private:
 public:
     void rotate(glm::quat rotation);
     void translate(const glm::vec3& translation);
+    void setPosition(const glm::vec3& translation);
+    void setOrientation(const glm::quat& orientation);
     const glm::vec3& getPosition() const;
     const glm::quat& getOrientation() const;
-    void setOrientation(const glm::quat& orientation);
+    
 };

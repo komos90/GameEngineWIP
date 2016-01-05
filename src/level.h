@@ -18,7 +18,7 @@ private:
     // Entity dies if it falls bellow this z value
     F32 deathPlaneZCoord_;
     std::string guid_;
-    std::vector<Entity*> entities_;
+    std::vector<Entity> entities_;
     // entities, statics, 
     // NOTE: Declare resources used in level inside script? Like includes ?
     // NOTE: Scripting Idea: "LevelConstructor" function loads/creates needed initial level elements.
@@ -26,18 +26,23 @@ private:
     //                       "LevelUpdate" function, run once per logic frame.
     // seperate files? construct.lua, (init_static.lua?), init.lua, update.lua
     // with shared state?
-    LuaScript levelScript_;
+    LuaLevelScript levelScript_;
 
     // TMP
     Camera camera_;
-    const Mesh* test_;
-    Entity testMonkey1_;
+    //const Mesh* test_;
+    //Entity testMonkey1_;
     
     // ENDTMP
 
 public:
-    explicit Level();
+    explicit Level(const std::string& guid);
     ~Level();
+
+    int addEntity();
+    const Entity& getEntity(int i) const;
+    void setEntity(int i, const Entity& entity);
+
     void events();
     void logic();
     void draw() const;

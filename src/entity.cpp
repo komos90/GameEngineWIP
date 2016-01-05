@@ -15,3 +15,6 @@ void Entity::rotate(glm::quat rotation) {
 void Entity::translate(const glm::vec3& translation) {
     transform_.translate(translation);
 }
+void Entity::setPosition(const glm::vec3& position) {
+    transform_.setPosition(position);
+}

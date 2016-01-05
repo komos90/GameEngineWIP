@@ -5,16 +5,32 @@
 #include "render_manager.h"
 #include "camera.h"
 
-Level::Level() {
-    test_ = gResourceManager.getMesh("crate/crate.dae");
+Level::Level(const std::string& guid) :
+    guid_(guid),
+    levelScript_(*this)
+{
+    //test_ = gResourceManager.getMesh("crate/crate.dae");
 
     // NOTE: Should create a factory method for Entity. static method in subClass?
-    testMonkey1_.setMesh(test_);
-    testMonkey1_.translate(glm::vec3(0.f, 0.f, -5.f));
+    //testMonkey1_.setMesh(test_);
+    //testMonkey1_.translate(glm::vec3(0.f, 0.f, -5.f));
+    levelScript_.runScript(guid + "/init.lua");
 }
 
 Level::~Level() {
 
+}
+int Level::addEntity() {
+    entities_.push_back(Entity());
+    return entities_.size() - 1;
+}
+const Entity& Level::getEntity(int i) const {
+    ASSERT(i >= 0 && i < static_cast<int>(entities_.size()));
+    return entities_[i];
+}
+void Level::setEntity(int i, const Entity& entity) {
+    ASSERT(i >= 0 && i <  static_cast<int>(entities_.size()));
+    entities_[i] = entity;
 }
 void Level::events() {
     //Events
@@ -51,8 +67,12 @@ void Level::events() {
     }
 }
 void Level::logic() {
-    testMonkey1_.rotate(glm::quat(glm::vec3(0.00f, 0.03f, 0.00f)));
+    //testMonkey1_.rotate(glm::quat(glm::vec3(0.00f, 0.03f, 0.00f)));
+    levelScript_.runScript(guid_ + "/update.lua");
 }
 void Level::draw() const {
-    gRenderManager.render(testMonkey1_, camera_);
+    //gRenderManager.render(testMonkey1_, camera_);
+    for (const auto& entity : entities_) {
+        gRenderManager.render(entity, camera_);
+    }
 }

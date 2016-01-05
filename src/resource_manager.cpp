@@ -71,7 +71,18 @@ void ResourceManager::loadGlobalResources() {
     crateRes.type = ResourceType::MESH;
     resources_["crate/crate.dae"] = crateRes;
     loadMesh("crate/crate.dae");
-
+    Resource turtleRes;
+    turtleRes.type = ResourceType::MESH;
+    resources_["enemies/turtle/turtle.dae"] = turtleRes;
+    loadMesh("enemies/turtle/turtle.dae");
+    Resource terrainRes;
+    terrainRes.type = ResourceType::MESH;
+    resources_["level1/terrain.dae"] = terrainRes;
+    loadMesh("level1/terrain.dae");
+    Resource playerRes;
+    playerRes.type = ResourceType::MESH;
+    resources_["player/player.dae"] = playerRes;
+    loadMesh("player/player.dae");
     //ENDTMP
 }
 
