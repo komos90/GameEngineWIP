@@ -28,23 +28,30 @@ void RenderManager::init() {
     sdlError = SDL_CreateWindowAndRenderer(800, 600, SDL_WINDOW_OPENGL, &window_, &renderer_);
     ASSERT(sdlError != -1);
 
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+    int Mv = 3;
+    int mv = 3;
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, Mv);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, mv);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-
+    int getMv, getmv;
+    SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &getMv);
+    SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &getmv);
+    ASSERT(getMv == Mv && getmv == mv);
     SDL_GLContext glContext = SDL_GL_CreateContext(window_);
     ASSERT(glContext != NULL);
 
     glewExperimental = GL_TRUE;
     GLenum glewError = glewInit();
     ASSERT(glewError == GLEW_OK);
+    // Bug in glew sets error flag.
+    glGetError();
 
     sdlError = SDL_GL_SetSwapInterval(1);
     ASSERT(sdlError >= 0);
 
     SDL_SetRelativeMouseMode(SDL_TRUE);
 
-    glClearColor(0.f, 0.f, 0.f, 1.f);
+    glClearColor(0.2f, 0.2f, 0.2f, 1.f);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
@@ -105,7 +112,7 @@ void RenderManager::render(Entity entity, Camera camera) {
     // NOTE: Encapsulate??
     const Mesh* entityMesh = entity.getMesh();
     ASSERT(entityMesh != nullptr);
-    if (entityMesh->vboId_ == -1 || entityMesh->uvboId_ == -1 || entityMesh->vnboId_ == -1) {
+    if (true) {
         std::vector<glm::vec4> vertexData;
         std::vector<glm::vec2> uvData;
         std::vector<glm::vec3> normalData;
@@ -118,21 +125,21 @@ void RenderManager::render(Entity entity, Camera camera) {
         }
 
         // Create & fill buffers if they haven't already been created
-        if (entityMesh->vboId_ == -1) {
+        if (true) {
             glGenBuffers(1, &vertexBufferHandle_);
             glBindBuffer(GL_ARRAY_BUFFER, vertexBufferHandle_);
             glBufferData(GL_ARRAY_BUFFER, vertexData.size() * 4 * sizeof(GLfloat), &vertexData[0], GL_STATIC_DRAW);
             glBindBuffer(GL_ARRAY_BUFFER, 0);
             entityMesh->vboId_ = vertexBufferHandle_;
         }
-        if (entityMesh->uvboId_ == -1) {
+        if (true) {
             glGenBuffers(1, &textureCoordsBufferHandle_);
             glBindBuffer(GL_ARRAY_BUFFER, textureCoordsBufferHandle_);
             glBufferData(GL_ARRAY_BUFFER, uvData.size() * 2 * sizeof(GLfloat), &uvData[0], GL_STATIC_DRAW);
             glBindBuffer(GL_ARRAY_BUFFER, 0);
             entityMesh->uvboId_ = textureCoordsBufferHandle_;
         }
-        if (entityMesh->vnboId_ == -1) {
+        if (true) {
             glGenBuffers(1, &normalBufferHandle_);
             glBindBuffer(GL_ARRAY_BUFFER, normalBufferHandle_);
             glBufferData(GL_ARRAY_BUFFER, normalData.size() * 3 * sizeof(GLfloat), &normalData[0], GL_STATIC_DRAW);
@@ -145,10 +152,14 @@ void RenderManager::render(Entity entity, Camera camera) {
     glUseProgram(shaderProgram_.getProgramId());
     glUniformMatrix4fv(ModelViewProjectionHandle_, 1, GL_FALSE, &modelViewMatrix[0][0]);
     glUniformMatrix4fv(ModelWorldProjectionHandle_, 1, GL_FALSE, &modelWorldMatrix[0][0]);
-    glProgramUniform1i(shaderProgram_.getProgramId(), textureSamplerHandle_, 0);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, entityMesh->getTexture()->getTextureId());
-    
+    glUniform1i(textureSamplerHandle_, 0);
+
+    GLuint VertexArrayID;
+    glGenVertexArrays(1, &VertexArrayID);
+    glBindVertexArray(VertexArrayID);
+
     glEnableVertexAttribArray(uvTexCoordsHandle_);
     glBindBuffer(GL_ARRAY_BUFFER, textureCoordsBufferHandle_);
     glVertexAttribPointer(uvTexCoordsHandle_, 2, GL_FLOAT, GL_FALSE, 0, NULL);

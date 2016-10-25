@@ -1,8 +1,21 @@
 #pragma once
 
 #include <string>
+#include <filesystem>
 
 #include "common_imports.h"
+
+using namespace std::tr2::sys;
+
+struct RecursiveDirectoryRange {
+    typedef recursive_directory_iterator iterator;
+    RecursiveDirectoryRange(path p) : p_(p) {}
+
+    iterator begin() { return recursive_directory_iterator(p_); }
+    iterator end() { return recursive_directory_iterator(); }
+
+    path p_;
+};
 
 class FileSystemManager {
 private:

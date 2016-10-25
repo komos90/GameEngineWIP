@@ -18,3 +18,6 @@ void Entity::translate(const glm::vec3& translation) {
 void Entity::setPosition(const glm::vec3& position) {
     transform_.setPosition(position);
 }
+void Entity::addPosition(const glm::vec3& position) {
+    transform_.translate(position);
+}

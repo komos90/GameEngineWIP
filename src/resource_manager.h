@@ -13,6 +13,7 @@ class ResourceManager {
 private:
     bool hasInit_;
     const std::string globalResourcesArchivePath_;
+    const std::string resourceBasePath_;
 
     std::map<std::string, Resource> resources_;
     std::vector<Mesh> meshes_;

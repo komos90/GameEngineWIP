@@ -54,12 +54,23 @@ int LuaLevelScript::setPosition(lua_State* state) {
     level_.setEntity(i, entity);
     return 0;
 }
+int LuaLevelScript::addPosition(lua_State* state) {
+    auto i = static_cast<int>(luaL_checkinteger(state_, 1));
+    auto x = static_cast<float>(luaL_checknumber(state_, 2));
+    auto y = static_cast<float>(luaL_checknumber(state_, 3));
+    auto z = static_cast<float>(luaL_checknumber(state_, 4));
+    auto entity = level_.getEntity(i);
+    entity.addPosition(glm::vec3(x, y, z));
+    level_.setEntity(i, entity);
+    return 0;
+}
 int LuaLevelScript::clone(lua_State* state) {
     auto i = static_cast<int>(luaL_checkinteger(state_, 1));
     auto entity = level_.getEntity(i);
     auto j = level_.addEntity();
     level_.setEntity(j, entity);
-    return 0;
+    lua_pushnumber(state_, j);
+    return 1;
 }
 LuaLevelScript::LuaLevelScript(Level& level) :
 level_(level){
@@ -71,6 +82,8 @@ level_(level){
     lua_setglobal(state_, "set_mesh");
     lua_pushcfunction(state_, dispatch<&LuaLevelScript::setPosition>);
     lua_setglobal(state_, "set_position");
+    lua_pushcfunction(state_, dispatch<&LuaLevelScript::addPosition>);
+    lua_setglobal(state_, "translate");
     lua_pushcfunction(state_, dispatch<&LuaLevelScript::clone>);
     lua_setglobal(state_, "clone");
 }

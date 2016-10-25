@@ -1,4 +1,4 @@
-#version 140
+#version 330
 in vec4 LVertexPos3D;
 in vec3 normals;
 in vec2 vertexUV;
