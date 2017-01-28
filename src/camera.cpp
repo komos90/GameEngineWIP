@@ -5,7 +5,7 @@
 Camera::Camera() {
     up_ = glm::vec3(0.f, 1.f, 0.f);
 }
-const Transform& Camera::getTransform() const {
+Transform& Camera::getTransform() {
     return transform_;
 }
 void Camera::rotate(glm::quat rotation) {

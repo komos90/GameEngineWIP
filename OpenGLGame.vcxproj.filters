@@ -154,5 +154,8 @@
     <ClInclude Include="src\clock.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\consts.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -29,7 +29,7 @@ public:
 
     void loadGlobalResources();
     const Mesh* getMesh(const std::string& guid);
-    const Texture* getTexture(const std::string& guid);
+    const Texture& getTexture(const std::string& guid);
 };
 
 extern ResourceManager gResourceManager;

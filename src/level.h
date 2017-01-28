@@ -19,6 +19,7 @@ private:
     F32 deathPlaneZCoord_;
     std::string guid_;
     std::vector<Entity> entities_;
+    Entity* player_;
     // entities, statics, 
     // NOTE: Declare resources used in level inside script? Like includes ?
     // NOTE: Scripting Idea: "LevelConstructor" function loads/creates needed initial level elements.
@@ -42,6 +43,7 @@ public:
     int addEntity();
     const Entity& getEntity(int i) const;
     void setEntity(int i, const Entity& entity);
+    void setPlayerEntity(U32 entityId);
 
     void events();
     void logic();

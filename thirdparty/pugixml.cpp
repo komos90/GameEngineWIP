@@ -11048,6 +11048,10 @@ PUGI__NS_BEGIN
 
 				_lexer.next();
 
+                if (var == nullptr) {
+                    throw_error("var was null. (added this because of static analysis)");
+                    return nullptr;
+                }
 				return new (alloc_node()) xpath_ast_node(ast_variable, var->type(), var);
 			}
 

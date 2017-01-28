@@ -9,6 +9,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "render_manager.h"
+#include "resource_manager.h"
 #include "assertions.h"
 
 
@@ -83,6 +84,8 @@ void RenderManager::render(Entity entity, Camera camera) {
     // NOTE: Should an entity be a POD?????
     Transform entityTransform = entity.getTransform();
     glm::mat4 rotationMatrix = glm::mat4_cast(entityTransform.getOrientation());
+    glm::mat4 scaleMatrix(entity.getTransform().getScale());
+    scaleMatrix[3][3] = 1.f;
     glm::mat4 translationMatrix(1.f);
     const glm::vec3& entityPosition = entityTransform.getPosition();
     translationMatrix[3][0] = entityPosition.x;
@@ -90,15 +93,12 @@ void RenderManager::render(Entity entity, Camera camera) {
     translationMatrix[3][2] = entityPosition.z;
 
     Transform cameraTransform = camera.getTransform();
-    glm::mat4 cameraRotationMatrix = glm::inverse(glm::mat4_cast(cameraTransform.getOrientation()));
+    glm::mat4 cameraRotationMatrix = glm::mat4_cast(glm::conjugate(cameraTransform.getOrientation()));
     glm::mat4 cameraTranslationMatrix(1.f);
-    const glm::vec3& cameraPosition = cameraTransform.getPosition();
+    const glm::vec3& cameraPosition = -cameraTransform.getPosition();
     cameraTranslationMatrix[3][0] = cameraPosition.x;
     cameraTranslationMatrix[3][1] = cameraPosition.y;
     cameraTranslationMatrix[3][2] = cameraPosition.z;
-
-    glm::mat4 scaleMatrix(1.f);
-    scaleMatrix[3][3] = 1.f;
 
     glm::mat4 perspectiveMatrix = glm::perspective(glm::pi<F32>() / 2.f, 4.f / 3.f, 0.1f, 500.f);
 
@@ -112,6 +112,7 @@ void RenderManager::render(Entity entity, Camera camera) {
     // NOTE: Encapsulate??
     const Mesh* entityMesh = entity.getMesh();
     ASSERT(entityMesh != nullptr);
+    GLuint texId = -1;
     if (true) {
         std::vector<glm::vec4> vertexData;
         std::vector<glm::vec2> uvData;
@@ -146,6 +147,27 @@ void RenderManager::render(Entity entity, Camera camera) {
             glBindBuffer(GL_ARRAY_BUFFER, 0);
             entityMesh->vnboId_ = normalBufferHandle_;
         }
+
+        //Load Texture
+        if (entityMesh->texId_ == -1) {
+            const Texture& texRef = entityMesh->getTexture();
+            const SDL_Surface* texSurf = texRef.getTexture();
+            glGenTextures(1, &texId);
+            glBindTexture(GL_TEXTURE_2D, texId);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texSurf->w, texSurf->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, texSurf->pixels);
+            GLuint errCode = glGetError();
+            if (errCode != GL_NO_ERROR) {
+                printf("OpenGL Error Code: %u", errCode);
+                ASSERT(false);
+            }
+            entityMesh->texId_ = texId;
+        }
+        texId = entityMesh->texId_;
+        
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glBindTexture(GL_TEXTURE_2D, texId);
     }
 
     // Render
@@ -153,7 +175,7 @@ void RenderManager::render(Entity entity, Camera camera) {
     glUniformMatrix4fv(ModelViewProjectionHandle_, 1, GL_FALSE, &modelViewMatrix[0][0]);
     glUniformMatrix4fv(ModelWorldProjectionHandle_, 1, GL_FALSE, &modelWorldMatrix[0][0]);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, entityMesh->getTexture()->getTextureId());
+    glBindTexture(GL_TEXTURE_2D, texId);
     glUniform1i(textureSamplerHandle_, 0);
 
     GLuint VertexArrayID;

@@ -43,6 +43,8 @@
     <IntDir>$(SolutionDir)\obj\$(Configuration)\</IntDir>
     <IncludePath>$(ProjectDir)libs\lua-5.3.2\include;$(ProjectDir)libs\SDL2_image-2.0.0\include;$(ProjectDir)thirdparty;$(ProjectDir)libs\glm;$(ProjectDir)libs\glew-1.12.0\include;$(ProjectDir)libs\SDL2-2.0.3\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)libs\lua-5.3.2;$(ProjectDir)libs\SDL2_image-2.0.0\lib\x86;$(ProjectDir)libs\glew-1.12.0\lib\Release\Win32;$(ProjectDir)libs\SDL2-2.0.3\lib\x86;$(LibraryPath)</LibraryPath>
+    <CodeAnalysisRuleSet>C:\Program Files (x86)\Microsoft Visual Studio 14.0\Team Tools\Static Analysis Tools\Rule Sets\NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)\bin\$(Configuration)\</OutDir>
@@ -57,6 +59,7 @@
       <SDLCheck>true</SDLCheck>
       <TreatWarningAsError>false</TreatWarningAsError>
       <PreprocessorDefinitions>ASSERTIONS_ENABLED;PUGIXML_HEADER_ONLY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <EnablePREfast>false</EnablePREfast>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -116,6 +119,7 @@
     <ClInclude Include="src\camera.h" />
     <ClInclude Include="src\clock.h" />
     <ClInclude Include="src\common_imports.h" />
+    <ClInclude Include="src\consts.h" />
     <ClInclude Include="src\entity.h" />
     <ClInclude Include="src\file_system_manager.h" />
     <ClInclude Include="src\game.h" />

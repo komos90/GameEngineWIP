@@ -12,8 +12,9 @@ private:
 public:
     void setMesh(const Mesh* mesh);
     const Mesh* getMesh();
-    const Transform& getTransform() const;
+    Transform& getTransform();
     void rotate(glm::quat rotation);
+    void scale(float scale);
     void translate(const glm::vec3& translation);
     void setPosition(const glm::vec3& position);
     void addPosition(const glm::vec3& position);

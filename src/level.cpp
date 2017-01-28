@@ -1,4 +1,7 @@
 #include <SDL.h>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/quaternion.hpp>
+#include<glm/gtx/rotate_vector.hpp>
 
 #include "level.h"
 #include "resource_manager.h"
@@ -15,10 +18,15 @@ Level::Level(const std::string& guid) :
     //testMonkey1_.setMesh(test_);
     //testMonkey1_.translate(glm::vec3(0.f, 0.f, -5.f));
     levelScript_.runScript(guid + "/init.lua");
+    ASSERT(player_ != nullptr);
+    camera_.getTransform().setPosition(glm::vec3(0.f, 0.f, 5.f));
 }
 
 Level::~Level() {
 
+}
+void Level::setPlayerEntity(U32 entityId) {
+    player_ = &entities_[entityId];
 }
 int Level::addEntity() {
     entities_.push_back(Entity());
@@ -41,33 +49,89 @@ void Level::events() {
         case SDL_QUIT:
             //running = false;
             break;
-        case SDL_KEYDOWN:
+        case SDL_KEYDOWN: {
             switch (e.key.keysym.sym) {
-            case SDLK_w:
-                camera_.translate(glm::vec3(0.f, 0.f, 0.1f));
-                break;
-            case SDLK_s:
-                camera_.translate(glm::vec3(0.f, 0.f, -0.1f));
-                break;
-            case SDLK_a:
-                camera_.translate(glm::vec3(0.1f, 0.f, 0.f));
-                break;
-            case SDLK_d:
-                camera_.translate(glm::vec3(-0.1f, 0.f, 0.f));
-                break;
             case SDLK_ESCAPE:
                 //running = false;
                 break;
             }
             break;
+        }
         case SDL_MOUSEMOTION:
             camera_.rotate(glm::quat(glm::vec3(-(F32)e.motion.yrel / 400.f, -(F32)e.motion.xrel / 400.f, 0.f)));
             break;
         }
     }
+
+    //Handle keyboard movement
+    auto keys = SDL_GetKeyboardState(NULL);
+
+    { //Player movement
+        auto moveVec = glm::vec3(0.f, 0.f, 0.f);
+        F32 moveSpeed = 0.3f;
+        if (keys[SDL_SCANCODE_W]) {
+            moveVec += glm::vec3(0.f, 0.f, -moveSpeed);
+        }
+        if (keys[SDL_SCANCODE_S]) {
+            moveVec += glm::vec3(0.f, 0.f, moveSpeed);
+        }
+        if (keys[SDL_SCANCODE_A]) {
+            moveVec += glm::vec3(-moveSpeed, 0.f, 0.f);
+        }
+        if (keys[SDL_SCANCODE_D]) {
+            moveVec += glm::vec3(moveSpeed, 0.f, 0.f);
+        }
+        auto rot4Mat = glm::mat4_cast(camera_.getTransform().getOrientation());
+        auto rot3Mat = glm::mat3(rot4Mat);
+        rot3Mat[2][2] = 0.f;
+        moveVec = rot3Mat * moveVec;
+        //WARN: equality comp with float
+        if (glm::length(moveVec) != 0) {
+            moveVec = moveSpeed * glm::normalize(moveVec);
+        }
+        player_->translate(moveVec);
+        auto lookMat = glm::lookAt(camera_.getTransform().getPosition(), player_->getTransform().getPosition(), gUpVec);
+        glm::quat camRot = glm::conjugate(glm::toQuat(lookMat));
+        camera_.getTransform().setOrientation(camRot);
+    }
+    { //Camera movement
+        auto moveVec = glm::vec3(0.f, 0.f, 0.f);
+        F32 moveSpeed = 0.3f;
+        if (keys[SDL_SCANCODE_UP]) {
+            moveVec += glm::vec3(0.f, -moveSpeed, 0.f);
+        }
+        if (keys[SDL_SCANCODE_DOWN]) {
+            moveVec += glm::vec3(0.f, moveSpeed, 0.f);
+        }
+        if (keys[SDL_SCANCODE_LEFT]) {
+            moveVec += glm::vec3(moveSpeed, 0.f, 0.f);
+        }
+        if (keys[SDL_SCANCODE_RIGHT]) {
+            moveVec += glm::vec3(-moveSpeed, 0.f, 0.f);
+        }
+        //WARN: equality comp with float
+        if (glm::length(moveVec) != 0) {
+            moveVec = moveSpeed * glm::normalize(moveVec);
+        }
+        auto cPos = camera_.getTransform().getPosition();
+        auto pPos = player_->getTransform().getPosition();
+        auto desiredDist = 10.0f;
+        auto actualDist = glm::length(pPos - cPos);
+        printf("%f\n", -actualDist + desiredDist);
+        moveVec[2] = -(actualDist - desiredDist) / 2;
+        
+        auto rot4Mat = glm::mat4_cast(camera_.getTransform().getOrientation());
+        auto rot3Mat = glm::mat3(rot4Mat);
+        rot3Mat[2][2] = 0.f;
+        moveVec = rot3Mat * moveVec;
+        
+        camera_.translate(moveVec);
+        auto lookMat = glm::lookAt(cPos, pPos, gUpVec);
+        glm::quat camRot = glm::conjugate(glm::toQuat(lookMat));
+        camera_.getTransform().setOrientation(camRot);
+    }
 }
 void Level::logic() {
-    //testMonkey1_.rotate(glm::quat(glm::vec3(0.00f, 0.03f, 0.00f)));
     levelScript_.runScript(guid_ + "/update.lua");
 }
 void Level::draw() const {

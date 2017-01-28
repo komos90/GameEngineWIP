@@ -1,15 +1,15 @@
 #pragma once
-
+#include <SDL.h>
 #include <gl/glew.h>
 #include <SDL_opengl.h>
 #include <gl/glu.h>
 
 class Texture {
 private:
-    GLuint textureId_;
+    SDL_Surface* texture_;
 public:
-    explicit Texture(GLuint textureId);
+    explicit Texture(SDL_Surface* textureId);
     ~Texture();
 
-    GLuint getTextureId() const;
+    const SDL_Surface* getTexture() const;
 };

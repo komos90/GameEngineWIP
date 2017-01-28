@@ -6,7 +6,7 @@ void Entity::setMesh(const Mesh* mesh) {
 const Mesh* Entity::getMesh() {
     return mesh_;
 }
-const Transform& Entity::getTransform() const {
+Transform& Entity::getTransform() {
     return transform_;
 }
 void Entity::rotate(glm::quat rotation) {
@@ -20,4 +20,7 @@ void Entity::setPosition(const glm::vec3& position) {
 }
 void Entity::addPosition(const glm::vec3& position) {
     transform_.translate(position);
+}
+void Entity::scale(float scale) {
+    transform_.scale(scale);
 }

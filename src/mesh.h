@@ -45,7 +45,7 @@ private:
     std::vector<glm::vec2> textureCoords_;
     std::vector<Face> faces_;
 
-    const Texture* texture_;
+    std::string texture_guid_;
 public:
     // NOTE: Should wrap opengl stuff?
     // handles for mesh data held in GPU
@@ -54,6 +54,7 @@ public:
     mutable GLuint uvboId_;
     mutable GLuint uviboId_;
     mutable GLuint vnboId_;
+    mutable GLuint texId_;
 
     explicit Mesh();
     // NOTE: Should be in gResourceManager
@@ -61,6 +62,6 @@ public:
     const std::vector<Vertex>& getVertices() const;
     const std::vector<Face>& getFaces() const;
     const std::vector<glm::vec2>& getTextureCoords() const;
-    const Texture* getTexture() const;
+    const Texture& getTexture() const;
 };
 

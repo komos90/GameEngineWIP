@@ -30,19 +30,9 @@ void ResourceManager::loadMesh(const std::string& guid) {
 void ResourceManager::loadTexture(const std::string& guid) {
     //NOTE: SDL should be wrapped or replaced.
     SDL_Surface* texSurf = IMG_Load((resourceBasePath_ + guid).c_str());
-    //NOTE OpenGL should be wrapped or done in different class
-    GLuint texId;
-    glGenTextures(1, &texId);
-    glBindTexture(GL_TEXTURE_2D, texId);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texSurf->w, texSurf->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, texSurf->pixels);
-    ASSERT(glGetError() == GL_NO_ERROR);
-    
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glBindTexture(GL_TEXTURE_2D, 0);
-    SDL_FreeSurface(texSurf);
+    ASSERT(texSurf != nullptr);
 
-    textures_.push_back(Texture(texId));
+    textures_.push_back(Texture(texSurf));
     resources_[guid].handle = textures_.size() - 1;
     resources_[guid].refCount++;
 }
@@ -104,15 +94,19 @@ const Mesh* ResourceManager::getMesh(const std::string& guid) {
     ASSERT(hasInit_);
     //NOTE: Maybe it's silly to have a resources Map, instead should have seperate mesh map, tex map etc.
     //NOTE: Meshes should probably be cached in the renderer.So store a GLuint id as well as mesh data in Mesh.
+    if (resources_[guid].handle == -1) {
+        loadMesh(guid);
+    }
     ASSERT(resources_.find(guid) != resources_.end());
     return &meshes_[resources_[guid].handle];
 }
 
-const Texture* ResourceManager::getTexture(const std::string& guid) {
+const Texture& ResourceManager::getTexture(const std::string& guid) {
     ASSERT(hasInit_);
     ASSERT(resources_.find(guid) != resources_.end());
     if (resources_[guid].handle == -1) {
         loadTexture(guid);
     }
-    return &textures_[resources_[guid].handle];
+    //NOTE: returning pointer probably bad idea
+    return textures_[resources_[guid].handle];
 }

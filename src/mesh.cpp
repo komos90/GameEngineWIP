@@ -67,7 +67,8 @@ Mesh::Mesh() :
     vboId_(-1),
     iboId_(-1),
     uvboId_(-1),
-    vnboId_(-1)
+    vnboId_(-1),
+    texId_(-1)
 {
 
 }
@@ -79,8 +80,8 @@ void Mesh::daeFileToMesh(std::string filePath) {
     auto result = doc.load_file(filePath.c_str());
     ASSERT(result.status == pugi::status_ok);
 
-    auto texturePath = doc.child("COLLADA").child("library_images").child("image").child("init_from").first_child().value();
-    texture_ = gResourceManager.getTexture(texturePath);
+    std::string texturePath = doc.child("COLLADA").child("library_images").child("image").child("init_from").first_child().value();
+    texture_guid_ = texturePath;
 
     auto meshNode = doc.child("COLLADA").child("library_geometries").child("geometry").child("mesh");
     auto polyListNode = meshNode.child("polylist");
@@ -90,11 +91,15 @@ void Mesh::daeFileToMesh(std::string filePath) {
     auto posVerticesNode = meshNode.find_child_by_attribute("source", "id", posSrcLink).child("float_array");
     auto normVerticesNode = meshNode.find_child_by_attribute("source", "id", normSrcLink).child("float_array");
     auto texVerticesNode = meshNode.find_child_by_attribute("source", "id", texSrcLink).child("float_array");
-    auto verticesStr = posVerticesNode.first_child().value();
-    auto normVerticesStr = normVerticesNode.first_child().value();
-    auto texVerticesStr = texVerticesNode.first_child().value();
-    auto indicesStr = polyListNode.child("p").first_child().value();
+    std::string verticesStr = posVerticesNode.first_child().value();
+    std::string normVerticesStr = normVerticesNode.first_child().value();
+    std::string texVerticesStr = texVerticesNode.first_child().value();
+    std::string indicesStr = polyListNode.child("p").first_child().value();
 
+    verticesStr.erase(verticesStr.find_last_not_of(" \n\r\t") + 1);
+    normVerticesStr.erase(normVerticesStr.find_last_not_of(" \n\r\t") + 1);
+    texVerticesStr.erase(texVerticesStr.find_last_not_of(" \n\r\t") + 1);
+    indicesStr.erase(indicesStr.find_last_not_of(" \n\r\t") + 1);
     auto verticesStrVec = util::splitString(verticesStr);
     auto normVerticesStrVec = util::splitString(normVerticesStr);
     auto texVerticesStrVec = util::splitString(texVerticesStr);
@@ -104,7 +109,8 @@ void Mesh::daeFileToMesh(std::string filePath) {
     std::vector<F32> normVerticesFloatVec(normVerticesStrVec.size());
     std::vector<F32> texVerticesFloatVec(texVerticesStrVec.size());
     std::vector<S32> indicesIntVec(indicesStrVec.size());
-    std::transform(verticesStrVec.begin(), verticesStrVec.end(), verticesFloatVec.begin(), [](std::string text)->F32 {return stof(text); });
+    //std::transform(verticesStrVec.begin(), verticesStrVec.end(), verticesFloatVec.begin(), [](std::string text)->F32 {return stof(text); });
+    for (int i = 0; i < verticesStrVec.size(); i++) { verticesFloatVec[i] = stof(verticesStrVec[i]); }
     std::transform(normVerticesStrVec.begin(), normVerticesStrVec.end(), normVerticesFloatVec.begin(), [](std::string text)->F32 {return stof(text); });
     std::transform(texVerticesStrVec.begin(), texVerticesStrVec.end(), texVerticesFloatVec.begin(), [](std::string text)->F32 {return stof(text); });
     std::transform(indicesStrVec.begin(), indicesStrVec.end(), indicesIntVec.begin(), [](std::string text)->S32 {return stoi(text); });
@@ -152,8 +158,8 @@ void Mesh::daeFileToMesh(std::string filePath) {
     }
 }
 
-const Texture* Mesh::getTexture() const {
-    return texture_;
+const Texture& Mesh::getTexture() const {
+    return gResourceManager.getTexture(texture_guid_);
 }
 
 const std::vector<glm::vec2>& Mesh::getTextureCoords() const {

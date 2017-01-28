@@ -6,6 +6,15 @@ const glm::vec3& Transform::getPosition() const {
 const glm::quat& Transform::getOrientation() const {
     return orientation_;
 }
+float Transform::getScale() const {
+    return scale_;
+}
+void Transform::scale(float scale) {
+    scale_ *= scale;
+}
+void Transform::setScale(float scale) {
+    scale_ = scale;
+}
 void Transform::setOrientation(const glm::quat& orientation) {
     orientation_ = orientation;
 }

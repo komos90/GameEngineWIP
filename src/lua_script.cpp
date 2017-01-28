@@ -36,6 +36,12 @@ int LuaLevelScript::createEntity(lua_State* state) {
     lua_pushnumber(state_, index);
     return 1;
 }
+int LuaLevelScript::setPlayerEntity(lua_State* state) {
+    U32 i = static_cast<int>(luaL_checkinteger(state_, 1));
+    level_.setPlayerEntity(i);
+    lua_pushnumber(state_, i);
+    return 1;
+}
 int LuaLevelScript::setMesh(lua_State* state) {
     auto i = static_cast<int>(luaL_checkinteger(state_, 1));
     auto meshPath = luaL_checkstring(state_, 2);
@@ -64,6 +70,14 @@ int LuaLevelScript::addPosition(lua_State* state) {
     level_.setEntity(i, entity);
     return 0;
 }
+int LuaLevelScript::scaleEntity(lua_State* state) {
+    auto i = static_cast<int>(luaL_checkinteger(state_, 1));
+    auto scale = static_cast<float>(luaL_checknumber(state_, 2));
+    auto entity = level_.getEntity(i);
+    entity.scale(scale);
+    level_.setEntity(i, entity);
+    return 0;
+}
 int LuaLevelScript::clone(lua_State* state) {
     auto i = static_cast<int>(luaL_checkinteger(state_, 1));
     auto entity = level_.getEntity(i);
@@ -78,6 +92,8 @@ level_(level){
     *static_cast<LuaLevelScript**>(lua_getextraspace(state_)) = this;
     lua_pushcfunction(state_, dispatch<&LuaLevelScript::createEntity>);
     lua_setglobal(state_, "create_entity");
+    lua_pushcfunction(state_, dispatch<&LuaLevelScript::setPlayerEntity>);
+    lua_setglobal(state_, "set_player");
     lua_pushcfunction(state_, dispatch<&LuaLevelScript::setMesh>);
     lua_setglobal(state_, "set_mesh");
     lua_pushcfunction(state_, dispatch<&LuaLevelScript::setPosition>);
@@ -86,6 +102,8 @@ level_(level){
     lua_setglobal(state_, "translate");
     lua_pushcfunction(state_, dispatch<&LuaLevelScript::clone>);
     lua_setglobal(state_, "clone");
+    lua_pushcfunction(state_, dispatch<&LuaLevelScript::scaleEntity>);
+    lua_setglobal(state_, "scale");
 }
 LuaLevelScript::~LuaLevelScript() {
 

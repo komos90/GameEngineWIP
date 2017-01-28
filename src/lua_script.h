@@ -32,9 +32,11 @@ public:
     template <memFunc func>
     static int dispatch(lua_State* L);
     int createEntity(lua_State* state);
+    int setPlayerEntity(lua_State* state);
     int setMesh(lua_State* state);
     int setPosition(lua_State* state);
     int addPosition(lua_State* state);
+    int scaleEntity(lua_State* state);
     int clone(lua_State* state);
 };
 

@@ -14,5 +14,6 @@ typedef int32_t S32;
 typedef int64_t S64;
 
 typedef float F32;
+typedef double F64;
 
 typedef __m128 VF32;

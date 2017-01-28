@@ -16,5 +16,5 @@ public:
     void rotateHorizontal(F32 radians);
     void rotateVertical(F32 radians);
     void translate(const glm::vec3& translation);
-    const Transform& getTransform() const;
+    Transform& getTransform();
 };
