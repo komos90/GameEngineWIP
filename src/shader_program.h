@@ -12,6 +12,7 @@ private:
 public:
     void init();
     void loadVertexShader(const std::string& filePath);
+    //NOTE: Implement or delete?
     void loadGeometryShader(const std::string& filePath);
     void loadFragmentShader(const std::string& filePath);
     void linkProgram();

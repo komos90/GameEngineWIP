@@ -18,7 +18,7 @@ void Transform::setScale(float scale) {
 void Transform::setOrientation(const glm::quat& orientation) {
     orientation_ = orientation;
 }
-void Transform::rotate(glm::quat rotation) {
+void Transform::rotate(const glm::quat& rotation) {
     orientation_ *= rotation;
 }
 void Transform::translate(const glm::vec3& translation) {

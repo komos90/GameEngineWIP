@@ -10,7 +10,7 @@ private:
     float scale_ = 1.f;
 public:
     void scale(float scale);
-    void rotate(glm::quat rotation);
+    void rotate(const glm::quat& rotation);
     void translate(const glm::vec3& translation);
     void setPosition(const glm::vec3& translation);
     void setOrientation(const glm::quat& orientation);

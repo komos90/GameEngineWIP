@@ -49,6 +49,8 @@ private:
 public:
     // NOTE: Should wrap opengl stuff?
     // handles for mesh data held in GPU
+    // NOTE: I don't think I'm using these apart from texId_, should
+    //       get these working.
     mutable GLuint vboId_;
     mutable GLuint iboId_;
     mutable GLuint uvboId_;

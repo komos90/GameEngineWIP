@@ -25,6 +25,7 @@ public:
     void init();
     void destroy();
     
+    //NOTE: Should fix this
     bool syncRead(const std::string& filePath, U8* buffer, size_t bufferSize, size_t& bytesRead);
     std::string readFileToString(const std::string& filePath);
 };

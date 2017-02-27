@@ -6,6 +6,8 @@
 #include "lua_script.h"
 #include "entity.h"
 #include "camera.h"
+#include "btBulletDynamicsCommon.h"
+#include "debug_draw.h"
 
 //main:
 //  StateStack:
@@ -20,6 +22,8 @@ private:
     std::string guid_;
     std::vector<Entity> entities_;
     Entity* player_;
+    btCollisionWorld* collisionWorld_;
+    mutable DebugDraw debugDraw_;
     // entities, statics, 
     // NOTE: Declare resources used in level inside script? Like includes ?
     // NOTE: Scripting Idea: "LevelConstructor" function loads/creates needed initial level elements.
@@ -28,13 +32,7 @@ private:
     // seperate files? construct.lua, (init_static.lua?), init.lua, update.lua
     // with shared state?
     LuaLevelScript levelScript_;
-
-    // TMP
     Camera camera_;
-    //const Mesh* test_;
-    //Entity testMonkey1_;
-    
-    // ENDTMP
 
 public:
     explicit Level(const std::string& guid);

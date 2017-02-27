@@ -1,0 +1,29 @@
+Do skybox properly
+
+Onscreen console:
+    Requires facility to draw UI
+    Get text from keypresses
+    System for some subsystem to have input "focus"
+
+
+
+Collision detection:
+    Collision Hulls on entities
+    Diff colision algorithms for diff Collsion Hulls
+
+Difuse shader for untextured objects
+
+"Reload level" functionality
+Tidy up rendering code.
+
+BUG! Can't put code after set_player() in init.lua
+
+
+
+
+
+DONE ________________________________
+-------------------------------------
+
+Debug Shapes:
+    System to draw wireframe spheres, boxes, etc.

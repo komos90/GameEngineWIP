@@ -1,5 +1,0 @@
-
-class Physics {
-private:
-
-};

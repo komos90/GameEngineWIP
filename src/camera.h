@@ -12,9 +12,10 @@ private:
     glm::vec3 up_;
 public:
     explicit Camera();
-    void rotate(glm::quat rotation);
+    void rotate(const glm::quat& rotation);
     void rotateHorizontal(F32 radians);
     void rotateVertical(F32 radians);
     void translate(const glm::vec3& translation);
     Transform& getTransform();
+    const Transform& getTransform() const;
 };

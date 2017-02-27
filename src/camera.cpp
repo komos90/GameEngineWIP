@@ -8,7 +8,10 @@ Camera::Camera() {
 Transform& Camera::getTransform() {
     return transform_;
 }
-void Camera::rotate(glm::quat rotation) {
+const Transform& Camera::getTransform() const {
+    return transform_;
+}
+void Camera::rotate(const glm::quat& rotation) {
     transform_.rotate(rotation);
 }
 void Camera::rotateHorizontal(F32 radians) {

@@ -5,13 +5,12 @@
 #include <gl/glu.h>
 #include <glm/geometric.hpp>
 #include <glm/mat4x4.hpp>
-//#include <glm/matrix.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "render_manager.h"
 #include "resource_manager.h"
 #include "assertions.h"
-
+#include "debug_draw.h"
 
 // Global singleton instance
 RenderManager gRenderManager;
@@ -61,6 +60,12 @@ void RenderManager::init() {
     shaderProgram_.loadFragmentShader("src/shaders/fragment_shader.glsl");
     shaderProgram_.linkProgram();
 
+    //Load debug lines shader
+    debugLinesShader_.init();
+    debugLinesShader_.loadVertexShader("src/shaders/debug_line_vertex_shader.glsl");
+    debugLinesShader_.loadFragmentShader("src/shaders/debug_line_fragment_shader.glsl");
+    debugLinesShader_.linkProgram();
+
     vertexPos3DHandle_ = glGetAttribLocation(shaderProgram_.getProgramId(), "LVertexPos3D");
     ASSERT(vertexPos3DHandle_ != -1);
     uvTexCoordsHandle_ = glGetAttribLocation(shaderProgram_.getProgramId(), "vertexUV");
@@ -80,7 +85,7 @@ void RenderManager::clear() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void RenderManager::render(Entity entity, Camera camera) {
+void RenderManager::render(const Entity& entity, const Camera& camera) {
     // NOTE: Should an entity be a POD?????
     Transform entityTransform = entity.getTransform();
     glm::mat4 rotationMatrix = glm::mat4_cast(entityTransform.getOrientation());
@@ -200,6 +205,51 @@ void RenderManager::render(Entity entity, Camera camera) {
     glDisableVertexAttribArray(vertexPos3DHandle_);
     // NOTE: When should I glDeleteBuffer() ??
     glUseProgram(NULL);
+}
+
+void RenderManager::renderDebug(DebugDraw& dDraw, const Camera& camera) {
+    Transform cameraTransform = camera.getTransform();
+    glm::mat4 cameraRotationMatrix = glm::mat4_cast(glm::conjugate(cameraTransform.getOrientation()));
+    glm::mat4 cameraTranslationMatrix(1.f);
+    const glm::vec3& cameraPosition = -cameraTransform.getPosition();
+    cameraTranslationMatrix[3][0] = cameraPosition.x;
+    cameraTranslationMatrix[3][1] = cameraPosition.y;
+    cameraTranslationMatrix[3][2] = cameraPosition.z;
+
+    glm::mat4 perspectiveMatrix = glm::perspective(glm::pi<F32>() / 2.f, 4.f / 3.f, 0.1f, 500.f);
+    glm::mat4 modelViewMatrix = perspectiveMatrix * cameraRotationMatrix * cameraTranslationMatrix;
+    
+    auto vertexPos3DHandle = glGetAttribLocation(debugLinesShader_.getProgramId(), "LVertexPos3D");
+    auto lineColorHandle = glGetAttribLocation(debugLinesShader_.getProgramId(), "lineColor");
+    auto ModelViewProjectionHandle = glGetUniformLocation(debugLinesShader_.getProgramId(), "MVP");
+
+    glDisable(GL_DEPTH_TEST);
+    glUseProgram(debugLinesShader_.getProgramId());
+    while (!dDraw.lines_.empty()) {
+        GLuint lineVBO;
+        auto dLine = dDraw.popDebugLine();
+        GLfloat lineBuf[] = {dLine.start_.x, dLine.start_.y, dLine.start_.z,
+                             dLine.color_.r, dLine.color_.g, dLine.color_.b,
+                             dLine.end_.x, dLine.end_.y, dLine.end_.z,
+                             dLine.color_.r, dLine.color_.g, dLine.color_.b};
+        glUniformMatrix4fv(ModelViewProjectionHandle, 1, GL_FALSE, &modelViewMatrix[0][0]);
+
+        glGenBuffers(1, &lineVBO);
+        glBindBuffer(GL_ARRAY_BUFFER, lineVBO);
+        glBufferData(GL_ARRAY_BUFFER, 4 * 3 * sizeof(GLfloat), &lineBuf[0], GL_STATIC_DRAW);
+
+        glEnableVertexAttribArray(vertexPos3DHandle);
+        glVertexAttribPointer(vertexPos3DHandle, 3, GL_FLOAT, GL_FALSE, 2 * 3 * sizeof(float), 0);
+
+        glEnableVertexAttribArray(lineColorHandle);
+        glVertexAttribPointer(lineColorHandle, 3, GL_FLOAT, GL_FALSE, 2 * 3 * sizeof(float), (GLvoid*) (1 * 3 * sizeof(float)));
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        glDrawArrays(GL_LINES, 0, 2);
+    }
+    glUseProgram(NULL);
+    glEnable(GL_DEPTH_TEST);
+    dDraw.flushLines();
 }
 
 void RenderManager::swap() {

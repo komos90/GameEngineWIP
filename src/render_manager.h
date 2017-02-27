@@ -9,6 +9,7 @@
 #include "shader_program.h"
 #include "entity.h"
 #include "camera.h"
+#include "debug_draw.h"
 
 class RenderManager {
 private:
@@ -18,6 +19,7 @@ private:
     SDL_Renderer* renderer_;
 
     ShaderProgram shaderProgram_;
+    ShaderProgram debugLinesShader_;
     GLuint vertexBufferHandle_;
     GLuint normalBufferHandle_;
     GLuint textureCoordsBufferHandle_;
@@ -36,7 +38,8 @@ public:
     void init();
     void destroy();
     void clear();
-    void render(Entity entity, Camera camera);
+    void render(const Entity& entity, const Camera& camera);
+    void renderDebug(DebugDraw& dDraw, const Camera& camera);
     void swap();
 };
 

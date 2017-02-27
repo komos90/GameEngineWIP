@@ -25,4 +25,8 @@ namespace util {
         stringList.push_back(text.substr(start, text.size() - start));
         return stringList;
     }
+
+    glm::vec3 bulletVecToGlmVec(const btVector3& vecIn) {
+        return glm::vec3(vecIn.getX(), vecIn.getY(), vecIn.getZ());
+    }
 }
