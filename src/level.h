@@ -9,6 +9,7 @@
 #include "btBulletDynamicsCommon.h"
 #include "debug_draw.h"
 
+class Game;
 //main:
 //  StateStack:
 //      MainGameState:
@@ -17,6 +18,7 @@
 //              entities
 class Level {
 private:
+    Game &game_;
     // Entity dies if it falls bellow this z value
     F32 deathPlaneZCoord_;
     std::string guid_;
@@ -35,11 +37,12 @@ private:
     Camera camera_;
 
 public:
-    explicit Level(const std::string& guid);
+    explicit Level(const std::string& guid, Game& game);
     ~Level();
 
     int addEntity();
     const Entity& getEntity(int i) const;
+    Entity& getEntity(int i);
     void setEntity(int i, const Entity& entity);
     void setPlayerEntity(U32 entityId);
 

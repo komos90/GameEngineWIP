@@ -8,7 +8,7 @@
 #include "level.h"
 
 Game::Game() :
-    level_("level1")
+    level_("level1", (*this))
 {
     
 }
@@ -16,7 +16,9 @@ Game::Game() :
 Game::~Game() {
 
 }
-
+void Game::stopRunning() {
+    running_ = false;
+}
 bool Game::isRunning() {
     return running_;
 }

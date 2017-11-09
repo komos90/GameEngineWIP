@@ -18,6 +18,7 @@ private:
 public:
     explicit Game();
     ~Game();
+    void stopRunning();
     bool isRunning();
     void events();
     void logic();

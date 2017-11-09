@@ -4,6 +4,8 @@
 
 #include "btBulletDynamicsCommon.h"
 
+#include <memory>
+
 #include "transform.h"
 #include "mesh.h"
 
@@ -11,12 +13,14 @@ class Entity {
 private:
     Transform transform_;
     const Mesh* mesh_;
-    btCollisionObject* collisionObject_;
-    btCollisionShape* collisionShape_;
-    btTransform *bulletTransform_;
+    std::unique_ptr<btCollisionObject> collisionObject_;
+    std::unique_ptr<btCollisionShape> collisionShape_;
+    btTransform bulletTransform_;
 public:
     explicit Entity();
     ~Entity();
+    Entity(Entity &&) = default;
+    void Entity::setupCollisionObject();
     void setMesh(const Mesh* mesh);
     const Mesh* getMesh() const;
     Transform& getTransform();

@@ -45,9 +45,8 @@ int LuaLevelScript::setPlayerEntity(lua_State* state) {
 int LuaLevelScript::setMesh(lua_State* state) {
     auto i = static_cast<int>(luaL_checkinteger(state_, 1));
     auto meshPath = luaL_checkstring(state_, 2);
-    auto entity = level_.getEntity(i);
+    auto &entity = level_.getEntity(i);
     entity.setMesh(gResourceManager.getMesh(meshPath));
-    level_.setEntity(i, entity);
     return 0;
 }
 int LuaLevelScript::setPosition(lua_State* state) {
@@ -55,9 +54,8 @@ int LuaLevelScript::setPosition(lua_State* state) {
     auto x = static_cast<float>(luaL_checknumber(state_, 2));
     auto y = static_cast<float>(luaL_checknumber(state_, 3));
     auto z = static_cast<float>(luaL_checknumber(state_, 4));
-    auto entity = level_.getEntity(i);
+    auto &entity = level_.getEntity(i);
     entity.setPosition(glm::vec3(x, y, z));
-    level_.setEntity(i, entity);
     return 0;
 }
 int LuaLevelScript::addPosition(lua_State* state) {
@@ -65,22 +63,20 @@ int LuaLevelScript::addPosition(lua_State* state) {
     auto x = static_cast<float>(luaL_checknumber(state_, 2));
     auto y = static_cast<float>(luaL_checknumber(state_, 3));
     auto z = static_cast<float>(luaL_checknumber(state_, 4));
-    auto entity = level_.getEntity(i);
+    auto &entity = level_.getEntity(i);
     entity.addPosition(glm::vec3(x, y, z));
-    level_.setEntity(i, entity);
     return 0;
 }
 int LuaLevelScript::scaleEntity(lua_State* state) {
     auto i = static_cast<int>(luaL_checkinteger(state_, 1));
     auto scale = static_cast<float>(luaL_checknumber(state_, 2));
-    auto entity = level_.getEntity(i);
+    auto &entity = level_.getEntity(i);
     entity.scale(scale);
-    level_.setEntity(i, entity);
     return 0;
 }
 int LuaLevelScript::clone(lua_State* state) {
     auto i = static_cast<int>(luaL_checkinteger(state_, 1));
-    auto entity = level_.getEntity(i);
+    auto &entity = level_.getEntity(i);
     auto j = level_.addEntity();
     level_.setEntity(j, entity);
     lua_pushnumber(state_, j);

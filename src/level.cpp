@@ -9,10 +9,12 @@
 #include "camera.h"
 #include "debug_draw.h"
 #include "util.h"
+#include "game.h"
 
-Level::Level(const std::string& guid) :
+Level::Level(const std::string& guid, Game& game) :
     guid_(guid),
-    levelScript_(*this)
+    levelScript_(*this), 
+    game_(game)
 {
     // START: Init Bullet3 physics world
     btDefaultCollisionConfiguration* collisionConfiguration = new btDefaultCollisionConfiguration();
@@ -35,18 +37,24 @@ void Level::setPlayerEntity(U32 entityId) {
 }
 int Level::addEntity() {
     entities_.push_back(Entity());
-    auto justAdded = entities_.back();
-    collisionWorld_->addCollisionObject(justAdded.getCollisionObject());
+    auto &justAdded = entities_.back();
+    justAdded.setupCollisionObject();
+    auto colObjAddr = justAdded.getCollisionObject();
+    collisionWorld_->addCollisionObject(colObjAddr);
     return entities_.size() - 1;
 }
 const Entity& Level::getEntity(int i) const {
     ASSERT(i >= 0 && i < static_cast<int>(entities_.size()));
     return entities_[i];
 }
+Entity& Level::getEntity(int i) {
+    ASSERT(i >= 0 && i < static_cast<int>(entities_.size()));
+    return entities_[i];
+}
 void Level::setEntity(int i, const Entity& entity) {
     ASSERT(i >= 0 && i <  static_cast<int>(entities_.size()));
     // NOTE: This using copy assignment??
-    entities_[i] = entity;
+    //entities_[i] = entity;
 }
 void Level::events() {
     // Events
@@ -55,13 +63,13 @@ void Level::events() {
     while (SDL_PollEvent(&e) == 1) {
         switch (e.type) {
             case SDL_QUIT: {
-                //running = false;
+                game_.stopRunning();
                 break;
             }
             case SDL_KEYDOWN: {
                 switch (e.key.keysym.sym) {
                 case SDLK_ESCAPE:
-                    //running = false;
+                    game_.stopRunning();
                     break;
                 }
                 break;
@@ -143,11 +151,11 @@ void Level::events() {
 }
 void Level::logic() {
     levelScript_.runScript(guid_ + "/update.lua");
-    for (auto entity : entities_) {
+    for (auto &entity : entities_) {
         entity.update();
     }
-    collisionWorld_->computeOverlappingPairs();
-    auto overlaps = collisionWorld_->getCollisionObjectArray();
+    //collisionWorld_->computeOverlappingPairs();
+    //auto overlaps = collisionWorld_->getCollisionObjectArray();
     
     if (DEBUG_DRAW_ENABLED) {
         collisionWorld_->debugDrawWorld();

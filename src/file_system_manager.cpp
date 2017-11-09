@@ -28,6 +28,7 @@ bool syncRead(const std::string& filePath, U8* buffer, size_t bufferSize, size_t
 
 std::string FileSystemManager::readFileToString(const std::string& filePath) {
     std::ifstream in(filePath, std::ios::in | std::ios::binary);
+    printf(filePath.c_str());
     ASSERT(in);
 
     std::string contents;

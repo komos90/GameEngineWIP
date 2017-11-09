@@ -5,20 +5,26 @@ Onscreen console:
     Get text from keypresses
     System for some subsystem to have input "focus"
 
-
-
 Collision detection:
     Collision Hulls on entities
     Diff colision algorithms for diff Collsion Hulls
 
+Proper Player 3D Model
+
+Render Untextured Meshes
+
+Gravity & Player Jump
+
 Difuse shader for untextured objects
+
+SubMeshes, bones and animation.
 
 "Reload level" functionality
 Tidy up rendering code.
 
 BUG! Can't put code after set_player() in init.lua
 
-
+Different level save format (lua is cool for scripting, but a super weird level storage format)
 
 
 

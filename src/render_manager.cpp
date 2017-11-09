@@ -131,27 +131,23 @@ void RenderManager::render(const Entity& entity, const Camera& camera) {
         }
 
         // Create & fill buffers if they haven't already been created
-        if (true) {
-            glGenBuffers(1, &vertexBufferHandle_);
-            glBindBuffer(GL_ARRAY_BUFFER, vertexBufferHandle_);
-            glBufferData(GL_ARRAY_BUFFER, vertexData.size() * 4 * sizeof(GLfloat), &vertexData[0], GL_STATIC_DRAW);
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
-            entityMesh->vboId_ = vertexBufferHandle_;
-        }
-        if (true) {
-            glGenBuffers(1, &textureCoordsBufferHandle_);
-            glBindBuffer(GL_ARRAY_BUFFER, textureCoordsBufferHandle_);
-            glBufferData(GL_ARRAY_BUFFER, uvData.size() * 2 * sizeof(GLfloat), &uvData[0], GL_STATIC_DRAW);
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
-            entityMesh->uvboId_ = textureCoordsBufferHandle_;
-        }
-        if (true) {
-            glGenBuffers(1, &normalBufferHandle_);
-            glBindBuffer(GL_ARRAY_BUFFER, normalBufferHandle_);
-            glBufferData(GL_ARRAY_BUFFER, normalData.size() * 3 * sizeof(GLfloat), &normalData[0], GL_STATIC_DRAW);
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
-            entityMesh->vnboId_ = normalBufferHandle_;
-        }
+        glGenBuffers(1, &vertexBufferHandle_);
+        glBindBuffer(GL_ARRAY_BUFFER, vertexBufferHandle_);
+        glBufferData(GL_ARRAY_BUFFER, vertexData.size() * 4 * sizeof(GLfloat), &vertexData[0], GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        entityMesh->vboId_ = vertexBufferHandle_;
+
+        glGenBuffers(1, &textureCoordsBufferHandle_);
+        glBindBuffer(GL_ARRAY_BUFFER, textureCoordsBufferHandle_);
+        glBufferData(GL_ARRAY_BUFFER, uvData.size() * 2 * sizeof(GLfloat), &uvData[0], GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        entityMesh->uvboId_ = textureCoordsBufferHandle_;
+
+        glGenBuffers(1, &normalBufferHandle_);
+        glBindBuffer(GL_ARRAY_BUFFER, normalBufferHandle_);
+        glBufferData(GL_ARRAY_BUFFER, normalData.size() * 3 * sizeof(GLfloat), &normalData[0], GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        entityMesh->vnboId_ = normalBufferHandle_;
 
         //Load Texture
         if (entityMesh->texId_ == -1) {
