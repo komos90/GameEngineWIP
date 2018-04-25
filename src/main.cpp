@@ -55,6 +55,7 @@ int main(S32 argc, char* argv[]) {
             SDL_Delay(1000 / FPS_CAP - frameDelta);
         }
     }
+
     //Shutdown subsystems
     gRenderManager.destroy();
     gResourceManager.init();

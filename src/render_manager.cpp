@@ -112,24 +112,16 @@ void RenderManager::render(const Entity& entity, const Camera& camera) {
 
     glm::vec3 testLight(1.f, 0.f, 0.f);
 
-
     // Only has to be done if data not already in GPU
     // NOTE: Encapsulate??
     const Mesh* entityMesh = entity.getMesh();
     ASSERT(entityMesh != nullptr);
     GLuint texId = -1;
     if (true) {
-        std::vector<glm::vec4> vertexData;
-        std::vector<glm::vec2> uvData;
-        std::vector<glm::vec3> normalData;
-        for (const auto& face : entityMesh->getFaces()) {
-            for (int i = 0; i < 3; i++) {
-                vertexData.push_back(entityMesh->getVertices()[face.getVertexIndexAt(i)].getVector());
-                uvData.push_back(entityMesh->getTextureCoords()[face.getUvIndexAt(i)]);
-                normalData.push_back(entityMesh->getVertices()[face.getVertexIndexAt(i)].getNormal());
-            }
-        }
-
+        const auto& vertexData = entityMesh->vertexData();
+        const auto& uvData = entityMesh->uvData();
+        const auto& normalData = entityMesh->normalData();
+        
         // Create & fill buffers if they haven't already been created
         glGenBuffers(1, &vertexBufferHandle_);
         glBindBuffer(GL_ARRAY_BUFFER, vertexBufferHandle_);

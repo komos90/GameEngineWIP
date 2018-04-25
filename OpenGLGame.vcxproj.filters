@@ -489,6 +489,12 @@
     <ClCompile Include="src\debug_draw.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\prof_timer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sky_box.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shaders\fragment_shader.glsl">
@@ -1214,6 +1220,12 @@
       <Filter>Bullet3</Filter>
     </ClInclude>
     <ClInclude Include="src\debug_draw.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\prof_timer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sky_box.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

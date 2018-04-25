@@ -45,6 +45,12 @@ private:
     std::vector<glm::vec2> textureCoords_;
     std::vector<Face> faces_;
 
+    //Render ready data
+    // THis is duplication & should really be the norma way it's stored, with Face & Vertex being views onto the data.
+    std::vector<glm::vec4> vertexData_;
+    std::vector<glm::vec2> uvData_;
+    std::vector<glm::vec3> normalData_;
+
     std::string texture_guid_;
 public:
     // NOTE: Should wrap opengl stuff?
@@ -57,6 +63,10 @@ public:
     mutable GLuint uviboId_;
     mutable GLuint vnboId_;
     mutable GLuint texId_;
+
+    const std::vector<glm::vec4>& vertexData() const;
+    const std::vector<glm::vec2>& uvData() const;
+    const std::vector<glm::vec3>& normalData() const;
 
     explicit Mesh();
     // NOTE: Should be in gResourceManager

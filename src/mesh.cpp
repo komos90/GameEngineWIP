@@ -156,6 +156,15 @@ void Mesh::daeFileToMesh(std::string filePath) {
             vertices_[posIndicesVec[i + 2]].addFaceIndex(i / 3);
         }
     }
+
+    //Create render ready version
+    for (const auto& face : getFaces()) {
+        for (int i = 0; i < 3; i++) {
+            vertexData_.push_back(getVertices()[face.getVertexIndexAt(i)].getVector());
+            uvData_.push_back(getTextureCoords()[face.getUvIndexAt(i)]);
+            normalData_.push_back(getVertices()[face.getVertexIndexAt(i)].getNormal());
+        }
+    }
 }
 
 const Texture& Mesh::getTexture() const {
@@ -164,4 +173,16 @@ const Texture& Mesh::getTexture() const {
 
 const std::vector<glm::vec2>& Mesh::getTextureCoords() const {
     return textureCoords_;
+}
+
+const std::vector<glm::vec4>& Mesh::vertexData() const {
+    return vertexData_;
+}
+
+const std::vector<glm::vec2>& Mesh::uvData() const {
+    return uvData_;
+}
+
+const std::vector<glm::vec3>& Mesh::normalData() const {
+    return normalData_;
 }

@@ -10,6 +10,7 @@
 #include "entity.h"
 #include "camera.h"
 #include "debug_draw.h"
+#include "prof_timer.h"
 
 class RenderManager {
 private:
