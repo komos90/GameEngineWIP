@@ -19,10 +19,10 @@ ResourceManager gResourceManager;
 void ResourceManager::loadMesh(const std::string& guid) {
     ASSERT(resources_[guid].type == ResourceType::MESH);
 
-    meshes_.push_back(Mesh());
+    meshes_.top().push(Mesh());
     //NOTE: Resource manager should  do the loading of dae file
     //NOTE: Should have a base path for resources
-    meshes_[meshes_.size() - 1].daeFileToMesh(resourceBasePath_ + guid);
+    meshes_.top().top().daeFileToMesh(resourceBasePath_ + guid);
     resources_[guid].handle = meshes_.size() - 1;
     resources_[guid].refCount++;
 }
@@ -32,7 +32,7 @@ void ResourceManager::loadTexture(const std::string& guid) {
     SDL_Surface* texSurf = IMG_Load((resourceBasePath_ + guid).c_str());
     ASSERT(texSurf != nullptr);
 
-    textures_.push_back(Texture(texSurf));
+    textures_.top().push(Texture(texSurf));
     resources_[guid].handle = textures_.size() - 1;
     resources_[guid].refCount++;
 }
@@ -57,6 +57,8 @@ void ResourceManager::destroy() {
 
 void ResourceManager::loadGlobalResources() {
     ASSERT(hasInit_);
+    S32 numOfMeshes = 0;
+    S32 numOfTextures = 0;
     for (auto it : RecursiveDirectoryRange(resourceBasePath_)) {
         auto fullPath = it.path().generic_string();
         auto shortPath = fullPath.substr(resourceBasePath_.size(), -1);
@@ -64,12 +66,16 @@ void ResourceManager::loadGlobalResources() {
             Resource meshResource;
             meshResource.type = ResourceType::MESH;
             resources_[shortPath] = meshResource;
+            numOfMeshes++;
         } else if (it.path().extension() == ".png") {
             Resource texResource;
             texResource.type = ResourceType::TEXTURE;
             resources_[shortPath] = texResource;
+            numOfTextures++;
         }
     }
+    meshes_.push(ResourceArray<Mesh>(numOfMeshes));
+    textures_.push(ResourceArray<Texture>(numOfTextures));
 
     for (auto it : RecursiveDirectoryRange(resourceBasePath_ + "global/")) {
         auto fullPath = it.path().generic_string();
@@ -98,7 +104,7 @@ const Mesh* ResourceManager::getMesh(const std::string& guid) {
         loadMesh(guid);
     }
     ASSERT(resources_.find(guid) != resources_.end());
-    return &meshes_[resources_[guid].handle];
+    return &meshes_.top()[resources_[guid].handle];
 }
 
 const Texture& ResourceManager::getTexture(const std::string& guid) {
@@ -108,5 +114,5 @@ const Texture& ResourceManager::getTexture(const std::string& guid) {
         loadTexture(guid);
     }
     //NOTE: returning pointer probably bad idea
-    return textures_[resources_[guid].handle];
+    return textures_.top()[resources_[guid].handle];
 }

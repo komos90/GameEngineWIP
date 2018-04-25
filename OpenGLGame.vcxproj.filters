@@ -1228,5 +1228,8 @@
     <ClInclude Include="src\sky_box.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\resource_array.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

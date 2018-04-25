@@ -63,15 +63,30 @@ const std::vector<Face>& Mesh::getFaces() const {
     return faces_;
 }
 
-Mesh::Mesh() :
-    vboId_(-1),
-    iboId_(-1),
-    uvboId_(-1),
-    vnboId_(-1),
-    texId_(-1)
+Mesh::Mesh() {}
+Mesh::Mesh(Mesh&& other)
+    : vertices_{ std::move(other.vertices_) }
+    , textureCoords_{ std::move(other.textureCoords_) }
+    , faces_{ std::move(other.faces_) }
+    , vertexData_{ std::move(other.vertexData_) }
+    , uvData_{ std::move(other.uvData_) }
+    , normalData_{ std::move(other.normalData_) }
+    , texture_guid_{ std::move(other.texture_guid_) }
 {
-
+    
 }
+
+Mesh& Mesh::operator=(Mesh&& other) {
+    vertices_ = std::move(other.vertices_);
+    textureCoords_ = std::move(other.textureCoords_);
+    faces_ = std::move(other.faces_);
+    vertexData_ = std::move(other.vertexData_);
+    uvData_ = std::move(other.uvData_);
+    normalData_ = std::move(other.normalData_);
+    texture_guid_ = std::move(other.texture_guid_);
+    return *this;
+}
+
 
 void Mesh::daeFileToMesh(std::string filePath) {
     vertices_.clear();

@@ -127,22 +127,22 @@ void RenderManager::render(const Entity& entity, const Camera& camera) {
         glBindBuffer(GL_ARRAY_BUFFER, vertexBufferHandle_);
         glBufferData(GL_ARRAY_BUFFER, vertexData.size() * 4 * sizeof(GLfloat), &vertexData[0], GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
-        entityMesh->vboId_ = vertexBufferHandle_;
+        //entityMesh->vboId_ = vertexBufferHandle_;
 
         glGenBuffers(1, &textureCoordsBufferHandle_);
         glBindBuffer(GL_ARRAY_BUFFER, textureCoordsBufferHandle_);
         glBufferData(GL_ARRAY_BUFFER, uvData.size() * 2 * sizeof(GLfloat), &uvData[0], GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
-        entityMesh->uvboId_ = textureCoordsBufferHandle_;
+       // entityMesh->uvboId_ = textureCoordsBufferHandle_;
 
         glGenBuffers(1, &normalBufferHandle_);
         glBindBuffer(GL_ARRAY_BUFFER, normalBufferHandle_);
         glBufferData(GL_ARRAY_BUFFER, normalData.size() * 3 * sizeof(GLfloat), &normalData[0], GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
-        entityMesh->vnboId_ = normalBufferHandle_;
+        //entityMesh->vnboId_ = normalBufferHandle_;
 
         //Load Texture
-        if (entityMesh->texId_ == -1) {
+        //if (entityMesh->texId_ == -1) {
             const Texture& texRef = entityMesh->getTexture();
             const SDL_Surface* texSurf = texRef.getTexture();
             glGenTextures(1, &texId);
@@ -153,9 +153,9 @@ void RenderManager::render(const Entity& entity, const Camera& camera) {
                 printf("OpenGL Error Code: %u", errCode);
                 ASSERT(false);
             }
-            entityMesh->texId_ = texId;
-        }
-        texId = entityMesh->texId_;
+            //entityMesh->texId_ = texId;
+        //}
+        //texId = entityMesh->texId_;
         
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);

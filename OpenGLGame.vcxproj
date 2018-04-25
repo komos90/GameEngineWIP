@@ -272,6 +272,7 @@
     <ClInclude Include="src\prof_timer.h" />
     <ClInclude Include="src\render_manager.h" />
     <ClInclude Include="src\resource.h" />
+    <ClInclude Include="src\resource_array.h" />
     <ClInclude Include="src\resource_manager.h" />
     <ClInclude Include="src\shader_program.h" />
     <ClInclude Include="src\sky_box.h" />

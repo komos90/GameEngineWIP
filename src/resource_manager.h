@@ -3,10 +3,12 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <stack>
 
 #include "resource.h"
 #include "mesh.h"
 #include "texture.h"
+#include "resource_array.h"
 
 //TODO: Implement resource manager PROPERLY!
 class ResourceManager {
@@ -16,8 +18,8 @@ private:
     const std::string resourceBasePath_;
 
     std::map<std::string, Resource> resources_;
-    std::vector<Mesh> meshes_;
-    std::vector<Texture> textures_;
+    std::stack<ResourceArray<Mesh>> meshes_;
+    std::stack<ResourceArray<Texture>> textures_;
 
     void loadMesh(const std::string& guid);
     void loadTexture(const std::string& guid);
