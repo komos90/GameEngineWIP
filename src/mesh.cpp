@@ -63,7 +63,15 @@ const std::vector<Face>& Mesh::getFaces() const {
     return faces_;
 }
 
-Mesh::Mesh() {}
+Mesh::Mesh()
+    : vboId_{ GLuint(-1) }
+    //, iboId_{ GLuint(-1) }
+    , uvboId_{ GLuint(-1) }
+    //, uviboId_{ GLuint(-1) }
+    , vnboId_{ GLuint(-1) }
+    , texId_{ GLuint(-1) }
+{}
+
 Mesh::Mesh(Mesh&& other)
     : vertices_{ std::move(other.vertices_) }
     , textureCoords_{ std::move(other.textureCoords_) }

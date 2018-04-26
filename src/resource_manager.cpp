@@ -23,7 +23,7 @@ void ResourceManager::loadMesh(const std::string& guid) {
     //NOTE: Resource manager should  do the loading of dae file
     //NOTE: Should have a base path for resources
     meshes_.top().top().daeFileToMesh(resourceBasePath_ + guid);
-    resources_[guid].handle = meshes_.size() - 1;
+    resources_[guid].handle = meshes_.top().topIndex() - 1;
     resources_[guid].refCount++;
 }
 
@@ -33,7 +33,7 @@ void ResourceManager::loadTexture(const std::string& guid) {
     ASSERT(texSurf != nullptr);
 
     textures_.top().push(Texture(texSurf));
-    resources_[guid].handle = textures_.size() - 1;
+    resources_[guid].handle = textures_.top().topIndex() - 1;
     resources_[guid].refCount++;
 }
 
@@ -56,6 +56,7 @@ void ResourceManager::destroy() {
 }
 
 void ResourceManager::loadGlobalResources() {
+    //CURRENTLY LOADS ALL RESOURCES, HOULD IMPROVE
     ASSERT(hasInit_);
     S32 numOfMeshes = 0;
     S32 numOfTextures = 0;
@@ -77,7 +78,7 @@ void ResourceManager::loadGlobalResources() {
     meshes_.push(ResourceArray<Mesh>(numOfMeshes));
     textures_.push(ResourceArray<Texture>(numOfTextures));
 
-    for (auto it : RecursiveDirectoryRange(resourceBasePath_ + "global/")) {
+    for (auto it : RecursiveDirectoryRange(resourceBasePath_)) {
         auto fullPath = it.path().generic_string();
         auto shortPath = fullPath.substr(resourceBasePath_.size(), -1);
         if (resources_.find(shortPath) != resources_.end()) {
@@ -100,9 +101,7 @@ const Mesh* ResourceManager::getMesh(const std::string& guid) {
     ASSERT(hasInit_);
     //NOTE: Maybe it's silly to have a resources Map, instead should have seperate mesh map, tex map etc.
     //NOTE: Meshes should probably be cached in the renderer.So store a GLuint id as well as mesh data in Mesh.
-    if (resources_[guid].handle == -1) {
-        loadMesh(guid);
-    }
+    ASSERT(resources_[guid].handle != -1);
     ASSERT(resources_.find(guid) != resources_.end());
     return &meshes_.top()[resources_[guid].handle];
 }
@@ -110,9 +109,7 @@ const Mesh* ResourceManager::getMesh(const std::string& guid) {
 const Texture& ResourceManager::getTexture(const std::string& guid) {
     ASSERT(hasInit_);
     ASSERT(resources_.find(guid) != resources_.end());
-    if (resources_[guid].handle == -1) {
-        loadTexture(guid);
-    }
-    //NOTE: returning pointer probably bad idea
+    ASSERT(resources_[guid].handle != -1);
+    
     return textures_.top()[resources_[guid].handle];
 }

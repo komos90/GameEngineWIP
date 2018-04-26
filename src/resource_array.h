@@ -11,7 +11,7 @@ public:
         : topIndex_{0}
         , capacity_{n}
     {
-        data_ = (T*)malloc(n * sizeof(data_));
+        data_ = new T[n];
     }
     ResourceArray(const ResourceArray&) =delete;
     ResourceArray(ResourceArray&& other)
@@ -25,14 +25,18 @@ public:
     ResourceArray& operator=(ResourceArray&&) =delete;
 
     ~ResourceArray() {
-        free(data_);
+        delete[] data_;
     }
 
     void push(const T& elem) {
-        data_[topIndex_] = elem;
+        data_[topIndex_++] = elem;
     }
     void push(T&& elem) {
-        data_[topIndex_] = std::move(elem);
+        data_[topIndex_++] = std::move(elem);
+    }
+
+    size_t topIndex() {
+        return topIndex_;
     }
 
     T& top() {
@@ -41,7 +45,7 @@ public:
     }
 
     T& operator[] (int i) {
-        ASSERT(i > 0 && i < capacity_)
+        ASSERT(i >= 0 && i < capacity_)
         return data_[i];
     }
 };

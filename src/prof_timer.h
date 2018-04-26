@@ -6,11 +6,13 @@ class ProfTimer {
     S64 averageTime_;
     S64 n_;
     S64 startTime_;
+    S32 printRate_;
+    std::string name_;
 
 public:
-    explicit ProfTimer();
+    explicit ProfTimer(const std::string& name = "", S32 printRate = -1);
     void start();
     void stop();
-    void print(const std::string& name = "") const;
+    void print() const;
     std::string toString() const;
 };

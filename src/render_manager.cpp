@@ -1,4 +1,5 @@
 #include <vector>
+#include <array>
 
 #include <gl/glew.h>
 #include <SDL_opengl.h>
@@ -11,6 +12,8 @@
 #include "resource_manager.h"
 #include "assertions.h"
 #include "debug_draw.h"
+#include "prof_timer.h"
+#include "time_manager.h"
 
 // Global singleton instance
 RenderManager gRenderManager;
@@ -54,6 +57,8 @@ void RenderManager::init() {
     glClearColor(0.2f, 0.2f, 0.2f, 1.f);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     shaderProgram_.init();
     shaderProgram_.loadVertexShader("src/shaders/vertex_shader.glsl");
@@ -65,6 +70,12 @@ void RenderManager::init() {
     debugLinesShader_.loadVertexShader("src/shaders/debug_line_vertex_shader.glsl");
     debugLinesShader_.loadFragmentShader("src/shaders/debug_line_fragment_shader.glsl");
     debugLinesShader_.linkProgram();
+
+    waterShader_.init();
+    waterShader_.loadVertexShader("src/shaders/water_vertex_shader.glsl");
+    waterShader_.loadGeometryShader("src/shaders/water_geometry_shader.glsl");
+    waterShader_.loadFragmentShader("src/shaders/untextured_fragment_shader.glsl");
+    waterShader_.linkProgram();
 
     vertexPos3DHandle_ = glGetAttribLocation(shaderProgram_.getProgramId(), "LVertexPos3D");
     ASSERT(vertexPos3DHandle_ != -1);
@@ -87,6 +98,7 @@ void RenderManager::clear() {
 
 void RenderManager::render(const Entity& entity, const Camera& camera) {
     // NOTE: Should an entity be a POD?????
+    //timer.start();
     Transform entityTransform = entity.getTransform();
     glm::mat4 rotationMatrix = glm::mat4_cast(entityTransform.getOrientation());
     glm::mat4 scaleMatrix(entity.getTransform().getScale());
@@ -112,56 +124,57 @@ void RenderManager::render(const Entity& entity, const Camera& camera) {
 
     glm::vec3 testLight(1.f, 0.f, 0.f);
 
-    // Only has to be done if data not already in GPU
-    // NOTE: Encapsulate??
     const Mesh* entityMesh = entity.getMesh();
     ASSERT(entityMesh != nullptr);
-    GLuint texId = -1;
-    if (true) {
+
+    // Create & fill buffers if they haven't already been created
+    if (entityMesh->vboId_ == -1) {
         const auto& vertexData = entityMesh->vertexData();
-        const auto& uvData = entityMesh->uvData();
-        const auto& normalData = entityMesh->normalData();
-        
-        // Create & fill buffers if they haven't already been created
-        glGenBuffers(1, &vertexBufferHandle_);
-        glBindBuffer(GL_ARRAY_BUFFER, vertexBufferHandle_);
+        glGenBuffers(1, &entityMesh->vboId_);
+        glBindBuffer(GL_ARRAY_BUFFER, entityMesh->vboId_);
         glBufferData(GL_ARRAY_BUFFER, vertexData.size() * 4 * sizeof(GLfloat), &vertexData[0], GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
-        //entityMesh->vboId_ = vertexBufferHandle_;
+    }
 
-        glGenBuffers(1, &textureCoordsBufferHandle_);
-        glBindBuffer(GL_ARRAY_BUFFER, textureCoordsBufferHandle_);
+    if (entityMesh->uvboId_ == -1) {
+        const auto& uvData = entityMesh->uvData();
+        glGenBuffers(1, &entityMesh->uvboId_);
+        glBindBuffer(GL_ARRAY_BUFFER, entityMesh->uvboId_);
         glBufferData(GL_ARRAY_BUFFER, uvData.size() * 2 * sizeof(GLfloat), &uvData[0], GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
-       // entityMesh->uvboId_ = textureCoordsBufferHandle_;
+    }
 
-        glGenBuffers(1, &normalBufferHandle_);
-        glBindBuffer(GL_ARRAY_BUFFER, normalBufferHandle_);
+    if (entityMesh->vnboId_ == -1) {
+        const auto& normalData = entityMesh->normalData();
+        glGenBuffers(1, &entityMesh->vnboId_);
+        glBindBuffer(GL_ARRAY_BUFFER, entityMesh->vnboId_);
         glBufferData(GL_ARRAY_BUFFER, normalData.size() * 3 * sizeof(GLfloat), &normalData[0], GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
-        //entityMesh->vnboId_ = normalBufferHandle_;
+    }
 
-        //Load Texture
-        //if (entityMesh->texId_ == -1) {
-            const Texture& texRef = entityMesh->getTexture();
-            const SDL_Surface* texSurf = texRef.getTexture();
-            glGenTextures(1, &texId);
-            glBindTexture(GL_TEXTURE_2D, texId);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texSurf->w, texSurf->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, texSurf->pixels);
-            GLuint errCode = glGetError();
-            if (errCode != GL_NO_ERROR) {
-                printf("OpenGL Error Code: %u", errCode);
-                ASSERT(false);
-            }
-            //entityMesh->texId_ = texId;
-        //}
-        //texId = entityMesh->texId_;
+    //Load Texture
+    GLuint texId = -1;
+    if (entityMesh->texId_ == -1) {
+        const Texture& texRef = entityMesh->getTexture();
+        const SDL_Surface* texSurf = texRef.getTexture();
+        glGenTextures(1, &texId);
+        glBindTexture(GL_TEXTURE_2D, texId);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texSurf->w, texSurf->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, texSurf->pixels);
+        GLuint errCode = glGetError();
+        if (errCode != GL_NO_ERROR) {
+            printf("OpenGL Error Code: %u\n", errCode);
+            ASSERT(false);
+        }
+        entityMesh->texId_ = texId;
+    }
+    texId = entityMesh->texId_;
         
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glBindTexture(GL_TEXTURE_2D, texId);
-    }
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glBindTexture(GL_TEXTURE_2D, texId);
 
     // Render
     glUseProgram(shaderProgram_.getProgramId());
@@ -176,22 +189,106 @@ void RenderManager::render(const Entity& entity, const Camera& camera) {
     glBindVertexArray(VertexArrayID);
 
     glEnableVertexAttribArray(uvTexCoordsHandle_);
-    glBindBuffer(GL_ARRAY_BUFFER, textureCoordsBufferHandle_);
+    glBindBuffer(GL_ARRAY_BUFFER, entityMesh->uvboId_);
     glVertexAttribPointer(uvTexCoordsHandle_, 2, GL_FLOAT, GL_FALSE, 0, NULL);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glEnableVertexAttribArray(vertexPos3DHandle_);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexBufferHandle_);
+    glBindBuffer(GL_ARRAY_BUFFER, entityMesh->vboId_);
     glVertexAttribPointer(vertexPos3DHandle_, 4, GL_FLOAT, GL_FALSE, 0, NULL);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glEnableVertexAttribArray(vertexNormalHandle_);
-    glBindBuffer(GL_ARRAY_BUFFER, normalBufferHandle_);
+    glBindBuffer(GL_ARRAY_BUFFER, entityMesh->vnboId_);
     glVertexAttribPointer(vertexNormalHandle_, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glDrawArrays(GL_TRIANGLES, 0, 3 * entity.getMesh()->getFaces().size());
     glDisableVertexAttribArray(vertexPos3DHandle_);
     // NOTE: When should I glDeleteBuffer() ??
+    glUseProgram(NULL);
+    //timer.stop();
+}
+
+template <size_t N>
+std::array<glm::vec4, N*N*6> createPlaneMesh(F32 zOff, F32 scale) {
+    const int vertsInSquare = 6;
+    scale *= 2;
+    std::array<glm::vec4, N*N*6> vertices;
+    for (int y = 0; y < N; ++y) {
+        for (int x = 0; x < N; ++x) {
+            F32 invN = 1.f / N;
+            F32 xOff = x * invN;
+            F32 yOff = y * invN;
+            size_t arrayOff = (y * N + x) * 6;
+            vertices[arrayOff    ] = glm::vec4{ (xOff        - 0.5f) * scale, (yOff        - 0.5f) * scale, zOff, 1.f };
+            vertices[arrayOff + 1] = glm::vec4{ (xOff + invN - 0.5f) * scale, (yOff        - 0.5f) * scale, zOff, 1.f };
+            vertices[arrayOff + 2] = glm::vec4{ (xOff        - 0.5f) * scale, (yOff + invN - 0.5f) * scale, zOff, 1.f };
+            vertices[arrayOff + 3] = glm::vec4{ (xOff + invN - 0.5f) * scale, (yOff        - 0.5f) * scale, zOff, 1.f };
+            vertices[arrayOff + 4] = glm::vec4{ (xOff + invN - 0.5f) * scale, (yOff + invN - 0.5f) * scale, zOff, 1.f };
+            vertices[arrayOff + 5] = glm::vec4{ (xOff        - 0.5f) * scale, (yOff + invN - 0.5f) * scale, zOff, 1.f };
+        }
+    }
+    return vertices;
+}
+
+void RenderManager::renderWaterLevel(const Camera& camera) {
+    auto planeVertices = createPlaneMesh<10>(0.f, 100.f);
+
+    Transform cameraTransform = camera.getTransform();
+    glm::mat4 cameraRotationMatrix = glm::mat4_cast(glm::conjugate(cameraTransform.getOrientation()));
+    glm::mat4 cameraTranslationMatrix(1.f);
+    const glm::vec3& cameraPosition = -cameraTransform.getPosition();
+    cameraTranslationMatrix[3][0] = cameraPosition.x;
+    cameraTranslationMatrix[3][1] = cameraPosition.y;
+    cameraTranslationMatrix[3][2] = cameraPosition.z;
+
+    glm::mat4 perspectiveMatrix = glm::perspective(glm::pi<F32>() / 2.f, 4.f / 3.f, 0.1f, 500.f);
+    glm::mat4 modelViewMatrix = perspectiveMatrix * cameraRotationMatrix * cameraTranslationMatrix;
+
+    // Create & fill buffers if they haven't already been created
+    // REMEMBER TO DELETE BUFFER
+    GLuint vboId = -1;
+    glGenBuffers(1, &vboId);
+    glBindBuffer(GL_ARRAY_BUFFER, vboId);
+    glBufferData(GL_ARRAY_BUFFER, planeVertices.size() * 4 * sizeof(GLfloat), &planeVertices[0], GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    glUseProgram(waterShader_.getProgramId());
+
+    //No need to call uniform every frame!
+    GLint timeHandle = glGetUniformLocation(waterShader_.getProgramId(), "time");
+    float time = (float)gTimeManager.getTicks() / (float)gTimeManager.getTicksPerSecond() + 0.5f;
+    printf("%f\n", fmod(time, (2 * 3.14159265359)));
+    glUniform1f(timeHandle, fmod(time, (2 * 3.14159265359)));
+    GLuint errCode = glGetError();
+    if (errCode != GL_NO_ERROR) {
+        printf("OpenGL Error Code: %u\n", errCode);
+        ASSERT(false);
+    }
+
+    GLuint mvpHandle = glGetUniformLocation(waterShader_.getProgramId(), "MVP");
+    glUniformMatrix4fv(mvpHandle, 1, GL_FALSE, &modelViewMatrix[0][0]);
+
+    errCode = glGetError();
+    if (errCode != GL_NO_ERROR) {
+        printf("OpenGL Error Code: %u\n", errCode);
+        ASSERT(false);
+    }
+    
+    GLuint VertexArrayID;
+    //SHOULD DELETE VERTEX ARRAY
+    glGenVertexArrays(1, &VertexArrayID);
+    glBindVertexArray(VertexArrayID);
+
+    GLuint vertexPos3DHandle = glGetAttribLocation(waterShader_.getProgramId(), "LVertexPos3D");
+    glEnableVertexAttribArray(vertexPos3DHandle);
+    glBindBuffer(GL_ARRAY_BUFFER, vboId);
+    glVertexAttribPointer(vertexPos3DHandle, 4, GL_FLOAT, GL_FALSE, 0, NULL);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    glDrawArrays(GL_TRIANGLES, 0, planeVertices.size());
+    glDisableVertexAttribArray(vertexPos3DHandle);
     glUseProgram(NULL);
 }
 
@@ -213,8 +310,15 @@ void RenderManager::renderDebug(DebugDraw& dDraw, const Camera& camera) {
 
     glDisable(GL_DEPTH_TEST);
     glUseProgram(debugLinesShader_.getProgramId());
+    
+    const size_t lineBufferSize = 4 * 3 * sizeof(GLfloat);
+
+    for (auto lineVBO : debugLineHandles_) {
+        glDeleteBuffers(1, &lineVBO);
+    }
+    debugLineHandles_.clear();
     while (!dDraw.lines_.empty()) {
-        GLuint lineVBO;
+        GLuint lineVBO = -1;
         auto dLine = dDraw.popDebugLine();
         GLfloat lineBuf[] = {dLine.start_.x, dLine.start_.y, dLine.start_.z,
                              dLine.color_.r, dLine.color_.g, dLine.color_.b,
@@ -224,7 +328,7 @@ void RenderManager::renderDebug(DebugDraw& dDraw, const Camera& camera) {
 
         glGenBuffers(1, &lineVBO);
         glBindBuffer(GL_ARRAY_BUFFER, lineVBO);
-        glBufferData(GL_ARRAY_BUFFER, 4 * 3 * sizeof(GLfloat), &lineBuf[0], GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, lineBufferSize, &lineBuf[0], GL_STATIC_DRAW);
 
         glEnableVertexAttribArray(vertexPos3DHandle);
         glVertexAttribPointer(vertexPos3DHandle, 3, GL_FLOAT, GL_FALSE, 2 * 3 * sizeof(float), 0);
@@ -234,6 +338,7 @@ void RenderManager::renderDebug(DebugDraw& dDraw, const Camera& camera) {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         glDrawArrays(GL_LINES, 0, 2);
+        debugLineHandles_.push_back(lineVBO);
     }
     glUseProgram(NULL);
     glEnable(GL_DEPTH_TEST);

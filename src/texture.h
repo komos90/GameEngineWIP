@@ -9,7 +9,7 @@ class Texture {
 private:
     SDL_Surface* texture_;
 public:
-    explicit Texture(SDL_Surface* textureId);
+    explicit Texture(SDL_Surface* textureId=nullptr);
     ~Texture();
 
     const SDL_Surface* getTexture() const;

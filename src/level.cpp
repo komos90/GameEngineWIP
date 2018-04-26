@@ -165,6 +165,7 @@ void Level::draw() const {
     for (const auto& entity : entities_) {
         gRenderManager.render(entity, camera_);
     }
+    gRenderManager.renderWaterLevel(camera_);
     if (DEBUG_DRAW_ENABLED) {
         gRenderManager.renderDebug(debugDraw_, camera_);
     }

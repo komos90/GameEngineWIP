@@ -57,12 +57,12 @@ public:
     // handles for mesh data held in GPU
     // NOTE: I don't think I'm using these apart from texId_, should
     //       get these working.
-    /*mutable GLuint vboId_;
-    mutable GLuint iboId_;
+    mutable GLuint vboId_;
+    //mutable GLuint iboId_;
     mutable GLuint uvboId_;
-    mutable GLuint uviboId_;
+    //mutable GLuint uviboId_;
     mutable GLuint vnboId_;
-    mutable GLuint texId_;*/
+    mutable GLuint texId_;
 
     const std::vector<glm::vec4>& vertexData() const;
     const std::vector<glm::vec2>& uvData() const;

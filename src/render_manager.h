@@ -21,9 +21,7 @@ private:
 
     ShaderProgram shaderProgram_;
     ShaderProgram debugLinesShader_;
-    GLuint vertexBufferHandle_;
-    GLuint normalBufferHandle_;
-    GLuint textureCoordsBufferHandle_;
+    ShaderProgram waterShader_;
 
     //tmp
     GLint vertexPos3DHandle_;
@@ -32,7 +30,10 @@ private:
     GLint ModelViewProjectionHandle_;
     GLint ModelWorldProjectionHandle_;
     GLint vertexNormalHandle_;
+    //ProfTimer timer{ "RENDER", 60 };
 
+    //Shoud be in debugdraw
+    std::vector<GLuint> debugLineHandles_;
 public:
     explicit RenderManager();
     ~RenderManager();
@@ -41,6 +42,7 @@ public:
     void clear();
     void render(const Entity& entity, const Camera& camera);
     void renderDebug(DebugDraw& dDraw, const Camera& camera);
+    void renderWaterLevel(const Camera& camera);
     void swap();
 };
 

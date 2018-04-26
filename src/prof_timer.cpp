@@ -2,9 +2,11 @@
 #include "prof_timer.h"
 #include "time_manager.h"
 
-ProfTimer::ProfTimer()
-    : averageTime_(0)
-    , n_(1)
+ProfTimer::ProfTimer(const std::string& name, S32 printRate)
+    : averageTime_{0}
+    , n_{1}
+    , printRate_{printRate}
+    , name_{name}
 {
 
 }
@@ -16,16 +18,17 @@ void ProfTimer::start() {
 void ProfTimer::stop() {
     // Cumulative moving average
     S64 delta = gTimeManager.getTicks() - startTime_;
-    //std::cout << "delta: " << std::to_string(delta) << std::endl;
     averageTime_ = averageTime_ + (delta - averageTime_) / n_;
-    //std::cout << "averageTime: " << std::to_string(averageTime_ / gTimeManager.getTicksPerSecond()) << std::endl;
     ++n_;
+    if (printRate_ != -1 && n_ % printRate_ == 0) {
+        print();
+    }
 }
 
 std::string ProfTimer::toString() const {
-    return "Average time (ms): " + std::to_string(1000.0 * (F64(averageTime_) / gTimeManager.getTicksPerSecond()));
+    return "[" + name_ + "] " + "Average time (ms): " + std::to_string(1000.0 * (F64(averageTime_) / gTimeManager.getTicksPerSecond()));
 }
 
-void ProfTimer::print(const std::string& name) const {
-    std::cout << "[" << name <<  "] " << toString() << std::endl;
+void ProfTimer::print() const {
+    std::cout <<  toString() << std::endl;
 }
