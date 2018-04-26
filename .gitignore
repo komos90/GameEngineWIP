@@ -20,8 +20,8 @@ build/
 [Oo]bj/
 
 .vs
-.VS.sb
-.sdf
+*.VC.db
+*.sdf
 
 # Libraries
 libs
