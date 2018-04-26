@@ -19,6 +19,10 @@ build/
 [Bb]in/
 [Oo]bj/
 
+.vs
+.VS.sb
+.sdf
+
 # Libraries
 libs
 # Assets
